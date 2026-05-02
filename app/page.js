@@ -5,100 +5,60 @@ export default function Home() {
   const [showAuth, setShowAuth] = useState(false)
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      color: "white",
-      fontFamily: "system-ui",
-      position: "relative",
-      overflow: "hidden"
-    }}>
+    <div style={root}>
 
       {/* 🌌 BACKGROUND */}
-      <div style={{
-        position: "fixed",
-        inset: 0,
-        backgroundImage: `
-          radial-gradient(circle at 20% 20%, rgba(168,85,247,0.2), transparent),
-          radial-gradient(circle at 80% 40%, rgba(34,211,238,0.2), transparent),
-          url("https://images.unsplash.com/photo-1639762681057-408e52192e55?q=80&w=1600&auto=format&fit=crop")
-        `,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        filter: "brightness(0.3)",
-        zIndex: 0
-      }} />
+      <div style={bg} />
 
-      {/* CONTENT */}
-      <div style={{ position: "relative", zIndex: 1, padding: 16 }}>
+      {/* 🌐 HEADER */}
+      <header style={header}>
+        <div style={logo}>TOGARA.AI</div>
 
-        {/* 🔥 HEADER */}
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 20
-        }}>
+        <input placeholder="Search ideas..." style={search} />
 
-          {/* LOGO */}
-          <div style={logo}>
-            NEXA.AI
-          </div>
-
-          {/* SEARCH */}
-          <input
-            placeholder="Search ideas..."
-            style={search}
-          />
-
-          {/* LOGIN BUTTON (IMAGE STYLE) */}
-          <div onClick={() => setShowAuth(true)} style={loginBtn}>
-            ⚡
-          </div>
+        <div style={navRight}>
+          <div style={iconBtn}>⚡</div>
+          <div style={iconBtn} onClick={() => setShowAuth(true)}>👤</div>
         </div>
+      </header>
 
-        {/* 🚀 HERO */}
-        <div style={card}>
-          <h1 style={title}>
-            Turn Ideas Into Money
-          </h1>
+      {/* 🚀 HERO */}
+      <section style={hero}>
+        <h1 style={title}>TURN IDEAS INTO MONEY</h1>
+        <p style={subtitle}>
+          AI-powered SaaS validation engine
+        </p>
 
-          <p style={{ opacity: 0.7 }}>
-            AI validates your startup before you build
-          </p>
+        <input placeholder="Describe your startup idea..." style={input} />
 
-          <input placeholder="Describe your idea..." style={input} />
+        <button style={cta}>⚡ ANALYZE</button>
+      </section>
 
-          <button style={cta}>
-            ⚡ Analyze Idea
-          </button>
-        </div>
+      {/* 📊 DASHBOARD GRID */}
+      <section style={grid}>
 
-        {/* 🔥 GRID */}
-        <div style={grid}>
-          <Panel title="MARKET">
-            <Bars />
-          </Panel>
+        <Panel title="MARKET">
+          <Bars />
+        </Panel>
 
-          <Panel title="ENGINE">
-            <Circle />
-          </Panel>
+        <Panel title="ENGINE">
+          <Circle />
+        </Panel>
 
-          <Panel title="FUNNEL">
-            <Funnel />
-          </Panel>
+        <Panel title="FUNNEL">
+          <Funnel />
+        </Panel>
 
-          <Panel title="TECH">
-            <Tags />
-          </Panel>
-        </div>
+        <Panel title="TECH">
+          <Tags />
+        </Panel>
 
-      </div>
+      </section>
 
       {/* 🔐 AUTH MODAL */}
       {showAuth && (
         <div style={modalOverlay} onClick={() => setShowAuth(false)}>
           <div style={modal} onClick={(e) => e.stopPropagation()}>
-
             <h2 style={modalTitle}>Access System</h2>
 
             <input placeholder="Email" style={input} />
@@ -106,10 +66,9 @@ export default function Home() {
 
             <button style={cta}>Login</button>
 
-            <div style={{ marginTop: 10, opacity: 0.6, fontSize: 12 }}>
+            <p style={{ marginTop: 10, opacity: 0.6 }}>
               No account? Sign up
-            </div>
-
+            </p>
           </div>
         </div>
       )}
@@ -118,11 +77,45 @@ export default function Home() {
   )
 }
 
-/* ================= STYLES ================= */
+/* ================= CORE STYLES ================= */
+
+const root = {
+  minHeight: "100vh",
+  color: "white",
+  fontFamily: "system-ui",
+  position: "relative",
+  overflow: "hidden"
+}
+
+const bg = {
+  position: "fixed",
+  inset: 0,
+  background: `
+    radial-gradient(circle at 20% 20%, rgba(168,85,247,0.25), transparent),
+    radial-gradient(circle at 80% 40%, rgba(34,211,238,0.25), transparent),
+    radial-gradient(circle at 50% 80%, rgba(236,72,153,0.15), transparent),
+    linear-gradient(#020617, #020617)
+  `,
+  zIndex: 0
+}
+
+/* ================= HEADER ================= */
+
+const header = {
+  position: "relative",
+  zIndex: 2,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  padding: 16,
+  backdropFilter: "blur(12px)",
+  borderBottom: "1px solid rgba(255,255,255,0.1)"
+}
 
 const logo = {
   fontWeight: "bold",
   fontSize: 18,
+  letterSpacing: 1,
   background: "linear-gradient(90deg,#22d3ee,#a855f7,#ec4899)",
   WebkitBackgroundClip: "text",
   color: "transparent"
@@ -138,7 +131,12 @@ const search = {
   color: "white"
 }
 
-const loginBtn = {
+const navRight = {
+  display: "flex",
+  gap: 10
+}
+
+const iconBtn = {
   width: 40,
   height: 40,
   borderRadius: "50%",
@@ -150,55 +148,75 @@ const loginBtn = {
   boxShadow: "0 0 15px #22d3ee"
 }
 
-const card = {
+/* ================= HERO ================= */
+
+const hero = {
+  position: "relative",
+  zIndex: 2,
   padding: 20,
+  marginTop: 10,
   borderRadius: 20,
+  margin: 16,
   background: "rgba(0,0,0,0.6)",
-  border: "1px solid rgba(168,85,247,0.4)",
-  marginBottom: 20
+  border: "1px solid rgba(168,85,247,0.4)"
 }
 
 const title = {
-  fontSize: 28,
+  fontSize: 32,
   fontWeight: "bold",
-  background: "linear-gradient(90deg,#22d3ee,#a855f7)",
+  background: "linear-gradient(90deg,#22d3ee,#a855f7,#ec4899)",
   WebkitBackgroundClip: "text",
   color: "transparent"
 }
 
+const subtitle = {
+  opacity: 0.7,
+  marginTop: 8
+}
+
 const input = {
   width: "100%",
-  marginTop: 10,
-  padding: 12,
-  borderRadius: 12,
+  marginTop: 12,
+  padding: 14,
+  borderRadius: 14,
   border: "1px solid rgba(255,255,255,0.2)",
   background: "rgba(0,0,0,0.4)",
   color: "white"
 }
 
 const cta = {
-  marginTop: 12,
+  marginTop: 14,
   width: "100%",
-  padding: 14,
-  borderRadius: 14,
+  padding: 16,
+  borderRadius: 16,
   border: "none",
   fontWeight: "bold",
   background: "linear-gradient(90deg,#22d3ee,#a855f7,#ec4899)",
-  color: "white"
+  color: "white",
+  boxShadow: "0 0 25px rgba(168,85,247,0.6)",
+  cursor: "pointer"
 }
 
+/* ================= GRID ================= */
+
 const grid = {
+  position: "relative",
+  zIndex: 2,
   display: "grid",
   gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))",
-  gap: 12
+  gap: 14,
+  padding: 16
 }
 
 const panel = {
   padding: 16,
   borderRadius: 16,
   background: "rgba(0,0,0,0.6)",
-  border: "1px solid rgba(168,85,247,0.4)"
+  border: "1px solid rgba(168,85,247,0.4)",
+  backdropFilter: "blur(10px)"
 }
+
+/* ================= MODAL ================= */
 
 const modalOverlay = {
   position: "fixed",
@@ -211,7 +229,7 @@ const modalOverlay = {
 }
 
 const modal = {
-  width: 300,
+  width: 320,
   padding: 20,
   borderRadius: 20,
   background: "rgba(0,0,0,0.9)",
@@ -221,7 +239,7 @@ const modal = {
 
 const modalTitle = {
   textAlign: "center",
-  marginBottom: 10,
+  marginBottom: 12,
   background: "linear-gradient(90deg,#22d3ee,#a855f7)",
   WebkitBackgroundClip: "text",
   color: "transparent"
@@ -240,7 +258,6 @@ function Panel({ title, children }) {
 
 function Bars() {
   const data = [40, 70, 90, 120]
-
   return (
     <div style={{ display: "flex", gap: 6, height: 100 }}>
       {data.map((d, i) => (
@@ -274,7 +291,6 @@ function Circle() {
 
 function Funnel() {
   const f = [["Awareness","100%"],["Signup","12%"],["Paid","4%"]]
-
   return (
     <div style={{ display: "grid", gap: 6 }}>
       {f.map(([l,v]) => (
