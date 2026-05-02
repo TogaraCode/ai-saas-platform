@@ -1,31 +1,42 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useEffect, useRef, useState } from "react"
 
 export default function Home() {
   const [idea, setIdea] = useState("")
-  const [result, setResult] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [showResult, setShowResult] = useState(false)
+  const beamRef = useRef(null)
 
   async function analyze() {
     setLoading(true)
-    setResult(false)
+    setShowResult(false)
 
     setTimeout(() => {
-      setResult(true)
       setLoading(false)
+      setShowResult(true)
     }, 1200)
   }
 
-  // simple floating particles
-  const [particles, setParticles] = useState([])
-
+  // pointer “laser beam”
   useEffect(() => {
-    const arr = Array.from({ length: 20 }).map(() => ({
-      left: Math.random() * 100,
-      top: Math.random() * 100,
-      size: Math.random() * 4 + 2
-    }))
-    setParticles(arr)
+    function move(e) {
+      if (!beamRef.current) return
+      beamRef.current.style.left = e.clientX + "px"
+      beamRef.current.style.top = e.clientY + "px"
+    }
+    window.addEventListener("mousemove", move)
+    return () => window.removeEventListener("mousemove", move)
+  }, [])
+
+  // scroll reveal
+  useEffect(() => {
+    const els = document.querySelectorAll(".reveal")
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) e.target.classList.add("visible")
+      })
+    }, { threshold: 0.2 })
+    els.forEach(el => obs.observe(el))
   }, [])
 
   return (
@@ -33,172 +44,142 @@ export default function Home() {
       minHeight: "100vh",
       background: "radial-gradient(circle at 30% 30%, #0ea5e9, #020617)",
       color: "white",
-      overflow: "hidden",
-      position: "relative"
+      overflowX: "hidden",
+      fontFamily: "system-ui"
     }}>
 
-      {/* PARTICLES */}
-      {particles.map((p, i) => (
-        <div key={i} style={{
-          position: "absolute",
-          left: `${p.left}%`,
-          top: `${p.top}%`,
-          width: p.size,
-          height: p.size,
-          background: "#22c55e",
-          borderRadius: "50%",
-          opacity: 0.2
-        }} />
-      ))}
+      {/* laser pointer */}
+      <div ref={beamRef} style={{
+        position: "fixed",
+        width: 200,
+        height: 200,
+        pointerEvents: "none",
+        background: "radial-gradient(circle, rgba(34,211,238,0.25), transparent 70%)",
+        transform: "translate(-50%, -50%)",
+        mixBlendMode: "screen",
+        zIndex: 1
+      }}/>
 
-      {/* MAIN */}
-      <div style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 20,
-        minHeight: "100vh"
-      }}>
-
-        <div style={{
-          width: "100%",
-          maxWidth: 520,
-          textAlign: "center"
-        }}>
-
-          {/* HERO */}
-          <h1 style={{
-            fontSize: 38,
-            fontWeight: 800,
-            marginBottom: 10,
-            textShadow: "0 0 20px rgba(34,197,94,0.5)"
-          }}>
-            Validate Your SaaS Idea
-          </h1>
-
-          <p style={{
-            color: "#94a3b8",
-            marginBottom: 20
-          }}>
-            AI-powered validation in seconds
-          </p>
-
-          {/* INPUT */}
-          <div style={{
-            background: "rgba(255,255,255,0.05)",
-            borderRadius: 20,
-            padding: 20,
-            backdropFilter: "blur(12px)",
-            boxShadow: "0 0 40px rgba(0,0,0,0.5)"
-          }}>
-
-            <textarea
-              value={idea}
-              onChange={(e) => setIdea(e.target.value)}
-              placeholder="Describe your SaaS idea..."
-              rows={3}
-              style={{
-                width: "100%",
-                padding: 15,
-                borderRadius: 12,
-                border: "none",
-                background: "#020617",
-                color: "white",
-                marginBottom: 15
-              }}
-            />
-
-            <button
-              onClick={analyze}
-              style={{
-                width: "100%",
-                padding: 15,
-                borderRadius: 12,
-                background: "linear-gradient(135deg,#22c55e,#06b6d4)",
-                color: "black",
-                fontWeight: "bold",
-                fontSize: 16,
-                boxShadow: "0 0 20px rgba(34,197,94,0.5)"
-              }}
-            >
-              {loading ? "Analyzing..." : "Analyze Idea"}
-            </button>
-          </div>
-
-          {/* LOADING */}
-          {loading && (
-            <div style={{
-              marginTop: 20,
-              padding: 20,
-              borderRadius: 16,
-              background: "rgba(255,255,255,0.05)"
-            }}>
-              🧠 AI is thinking...
-            </div>
-          )}
-
-          {/* RESULT */}
-          {result && (
-            <div style={{
-              marginTop: 20,
-              padding: 20,
-              borderRadius: 16,
-              background: "rgba(255,255,255,0.05)",
-              transform: "perspective(800px) rotateX(2deg)"
-            }}>
-
-              <div style={{
-                fontSize: 26,
-                fontWeight: "bold",
-                color: "#22c55e"
-              }}>
-                ⭐ Score: 7.8 / 10
-              </div>
-
-              <p style={{ marginTop: 10 }}>
-                High demand SaaS idea with strong monetization potential.
-              </p>
-
-              <div style={{
-                marginTop: 15,
-                padding: 10,
-                borderRadius: 10,
-                background: "rgba(34,197,94,0.1)"
-              }}>
-                🔒 Unlock full strategy
-              </div>
-            </div>
-          )}
-
-        </div>
-      </div>
-
-      {/* SCROLL SECTION */}
-      <div style={{
+      {/* HERO */}
+      <section style={{
         padding: 40,
         textAlign: "center"
       }}>
-        <h2 style={{ fontSize: 24 }}>Why this works</h2>
-
-        <div style={{
-          display: "grid",
-          gap: 20,
-          marginTop: 20
+        <h1 style={{
+          fontSize: 40,
+          fontWeight: 800,
+          textShadow: "0 0 20px #22d3ee"
         }}>
+          AI SaaS Validator
+        </h1>
 
-          {["Market Analysis", "Monetization", "Risk Detection"].map((item, i) => (
-            <div key={i} style={{
-              padding: 20,
-              borderRadius: 16,
-              background: "rgba(255,255,255,0.05)",
-              transform: "translateZ(20px)",
-              transition: "0.3s"
-            }}>
-              {item}
-            </div>
-          ))}
+        <p style={{
+          color: "#94a3b8",
+          marginTop: 10
+        }}>
+          Holographic intelligence for startup ideas
+        </p>
+
+        {/* input */}
+        <div style={{
+          marginTop: 30,
+          maxWidth: 500,
+          marginInline: "auto",
+          padding: 20,
+          borderRadius: 20,
+          background: "rgba(255,255,255,0.05)",
+          backdropFilter: "blur(12px)",
+          boxShadow: "0 0 40px rgba(34,211,238,0.15)"
+        }}>
+          <textarea
+            value={idea}
+            onChange={(e) => setIdea(e.target.value)}
+            placeholder="Describe your SaaS idea..."
+            rows={3}
+            style={{
+              width: "100%",
+              padding: 12,
+              borderRadius: 12,
+              background: "#020617",
+              border: "1px solid #334155",
+              color: "white"
+            }}
+          />
+
+          <button onClick={analyze} style={{
+            marginTop: 15,
+            width: "100%",
+            padding: 14,
+            borderRadius: 12,
+            background: "linear-gradient(90deg,#22c55e,#06b6d4,#a855f7)",
+            fontWeight: "bold",
+            color: "black",
+            boxShadow: "0 0 20px rgba(34,211,238,0.5)"
+          }}>
+            {loading ? "Analyzing..." : "Analyze Idea"}
+          </button>
         </div>
-      </div>
+
+        {loading && (
+          <div style={{ marginTop: 20 }}>
+            🧠 AI is scanning global market data...
+          </div>
+        )}
+
+        {showResult && (
+          <div style={{
+            marginTop: 20,
+            padding: 20,
+            borderRadius: 16,
+            background: "rgba(255,255,255,0.05)",
+            transform: "perspective(800px) rotateX(3deg)"
+          }}>
+            ⭐ Score: 7.8 / 10
+            <p>Strong SaaS potential with scalable monetization.</p>
+          </div>
+        )}
+      </section>
+
+      {/* DATA DASHBOARD */}
+      <section style={{
+        padding: 40,
+        display: "grid",
+        gap: 20
+      }}>
+
+        {[
+          { title: "$307B SaaS Market", desc: "Global SaaS market size (2024)" },
+          { title: "$3.6T AI Economy", desc: "Projected AI contribution by 2030" },
+          { title: "18.7% CAGR", desc: "SaaS growth rate (PwC / Gartner est.)" }
+        ].map((card, i) => (
+          <div key={i} className="reveal" style={{
+            padding: 20,
+            borderRadius: 20,
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            transition: "0.6s",
+            transform: "translateY(40px)"
+          }}>
+            <h3 style={{
+              fontSize: 20,
+              color: "#22d3ee"
+            }}>{card.title}</h3>
+            <p style={{ color: "#94a3b8" }}>{card.desc}</p>
+          </div>
+        ))}
+
+      </section>
+
+      {/* STYLES */}
+      <style jsx>{`
+        .reveal {
+          opacity: 0;
+        }
+        .reveal.visible {
+          opacity: 1;
+          transform: translateY(0px);
+        }
+      `}</style>
 
     </div>
   )
