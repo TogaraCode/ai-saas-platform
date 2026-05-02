@@ -34,9 +34,7 @@ export default function Home() {
     const els = document.querySelectorAll(".reveal")
     const obs = new IntersectionObserver((entries) => {
       entries.forEach((e) => {
-        if (e.isIntersecting) {
-          e.target.classList.add("visible")
-        }
+        if (e.isIntersecting) e.target.classList.add("visible")
       })
     }, { threshold: 0.2 })
 
@@ -52,11 +50,11 @@ export default function Home() {
       overflowX: "hidden"
     }}>
 
-      {/* pointer glow */}
+      {/* POINTER LIGHT */}
       <div ref={beamRef} style={{
         position: "fixed",
-        width: 200,
-        height: 200,
+        width: 250,
+        height: 250,
         pointerEvents: "none",
         background: "radial-gradient(circle, rgba(34,211,238,0.25), transparent 70%)",
         transform: "translate(-50%, -50%)",
@@ -67,27 +65,27 @@ export default function Home() {
       {/* HERO */}
       <section style={{ padding: 40, textAlign: "center" }}>
         <h1 style={{
-          fontSize: 42,
+          fontSize: 44,
           fontWeight: 800,
-          textShadow: "0 0 20px #22d3ee"
+          textShadow: "0 0 25px #22d3ee"
         }}>
           AI SaaS Validator
         </h1>
 
         <p style={{ color: "#94a3b8" }}>
-          Data-driven validation powered by AI
+          Holographic intelligence for startup ideas
         </p>
 
-        {/* input */}
+        {/* INPUT */}
         <div style={{
           marginTop: 30,
-          maxWidth: 500,
+          maxWidth: 520,
           marginInline: "auto",
           padding: 20,
           borderRadius: 20,
           background: "rgba(255,255,255,0.05)",
-          backdropFilter: "blur(12px)",
-          boxShadow: "0 0 40px rgba(34,211,238,0.2)"
+          backdropFilter: "blur(14px)",
+          boxShadow: "0 0 60px rgba(34,211,238,0.25)"
         }}>
           <textarea
             value={idea}
@@ -111,7 +109,8 @@ export default function Home() {
             borderRadius: 12,
             background: "linear-gradient(90deg,#22c55e,#06b6d4,#a855f7)",
             fontWeight: "bold",
-            color: "black"
+            color: "black",
+            boxShadow: "0 0 20px #22d3ee"
           }}>
             {loading ? "Analyzing..." : "Analyze Idea"}
           </button>
@@ -131,6 +130,24 @@ export default function Home() {
         )}
       </section>
 
+      {/* LIVE DATA TICKER */}
+      <div style={{
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        borderTop: "1px solid rgba(255,255,255,0.1)",
+        borderBottom: "1px solid rgba(255,255,255,0.1)",
+        padding: 10,
+        fontSize: 14,
+        color: "#22d3ee"
+      }}>
+        <div style={{
+          display: "inline-block",
+          animation: "scroll 20s linear infinite"
+        }}>
+          🚀 SaaS Market $307B • AI Economy $3.6T • 18.7% CAGR • 10,000+ Startups • Data-driven validation •
+        </div>
+      </div>
+
       {/* DATA CARDS */}
       <section style={{
         padding: 40,
@@ -148,21 +165,27 @@ export default function Home() {
         ))}
       </section>
 
-      {/* CHART */}
-      <section style={{
-        padding: 40,
-        textAlign: "center"
-      }}>
-        <h2>Revenue Growth Projection</h2>
+      {/* BAR CHART */}
+      <section style={{ padding: 40 }}>
+        <h2 style={{ textAlign: "center" }}>Revenue Growth</h2>
 
-        <svg width="100%" height="200">
-          <polyline
-            fill="none"
-            stroke="#22d3ee"
-            strokeWidth="3"
-            points="0,150 80,130 160,110 240,80 320,50"
-          />
-        </svg>
+        <div style={{
+          display: "flex",
+          gap: 10,
+          alignItems: "flex-end",
+          height: 200,
+          marginTop: 20
+        }}>
+          {[20, 40, 80, 120, 160].map((h, i) => (
+            <div key={i} style={{
+              flex: 1,
+              height: h,
+              background: "linear-gradient(#22d3ee,#a855f7)",
+              borderRadius: 6,
+              boxShadow: "0 0 15px #22d3ee"
+            }}/>
+          ))}
+        </div>
       </section>
 
       {/* STYLES */}
@@ -180,6 +203,11 @@ export default function Home() {
         .visible {
           opacity: 1;
           transform: translateY(0);
+        }
+
+        @keyframes scroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-100%); }
         }
       `}</style>
 
