@@ -1,19 +1,11 @@
 "use client"
 import { useState, useEffect } from "react"
 
+/* ================= MAIN ================= */
+
 export default function Home() {
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
-  const [width, setWidth] = useState(0)
-
-  useEffect(() => {
-    const update = () => setWidth(window.innerWidth)
-    update()
-    window.addEventListener("resize", update)
-    return () => window.removeEventListener("resize", update)
-  }, [])
-
-  const isMobile = width < 640
 
   return (
     <div style={root}>
@@ -27,74 +19,88 @@ export default function Home() {
         {/* HEADER */}
         <div style={header}>
           <div style={logo}>
-            <span style={logoMain}>NEXUS</span>
-            <span style={logoSub}>CORE</span>
+            <span style={logoMain}>QUANTUM</span>
+            <span style={logoSub}>AI</span>
           </div>
 
-          {!isMobile && <input placeholder="Search ideas..." style={search} />}
+          <input placeholder="Search startup ideas..." style={search} />
 
           <div style={icon}>⚡</div>
           <div style={icon}>👤</div>
         </div>
 
         {/* HERO */}
-        <div style={hero}>
-          <h1 style={title}>
-            <span style={gradientText}>AI VALIDATION</span><br/>
-            <span style={gradientText}>SYSTEM</span>
-          </h1>
+        <TiltCard>
+          <div style={hero}>
+            <h1 style={title}>
+              <span style={gradientText}>PREDICT</span><br />
+              <span style={gradientText}>SUCCESS</span>
+            </h1>
 
-          <p style={subtitle}>
-            Predict success before you build.
-          </p>
+            <p style={subtitle}>
+              AI-powered SaaS validation engine
+            </p>
 
-          <input placeholder="Describe your idea..." style={input} />
+            <input placeholder="Describe your idea..." style={input} />
 
-          <button
-            style={cta}
-            onClick={() => {
-              setLoading(true)
-              setTimeout(() => {
-                setLoading(false)
-                setResult({
-                  score: 82,
-                  demand: 78,
-                  monetization: 74
-                })
-              }, 1200)
-            }}
-          >
-            ⚡ ANALYZE
-          </button>
+            <button
+              style={cta}
+              onClick={() => {
+                setLoading(true)
+                setTimeout(() => {
+                  setLoading(false)
+                  setResult({
+                    score: 86,
+                    demand: 81,
+                    monetization: 76,
+                    revenue: 14890,
+                    growth: 24.6
+                  })
+                }, 1200)
+              }}
+            >
+              ⚡ ANALYZE
+            </button>
 
-          {loading && <div style={scan}></div>}
-        </div>
+            {loading && <div style={scan}></div>}
+          </div>
+        </TiltCard>
 
         {/* DASHBOARD */}
         {result && (
           <div style={dashboard}>
 
-            <Panel title="CORE SCORE">
-              <HolographicChart value={result.score} />
-            </Panel>
+            <TiltCard>
+              <Panel title="CORE SCORE">
+                <Holo value={result.score} />
+              </Panel>
+            </TiltCard>
 
-            <Panel title="GROWTH TRAJECTORY">
-              <LineChart />
-            </Panel>
+            <TiltCard>
+              <Panel title="REVENUE TRACTION">
+                <Counter value={result.revenue} prefix="€" />
+                <LineChart />
+              </Panel>
+            </TiltCard>
 
-            <Panel title="MARKET EXPANSION">
-              <BarChart />
-            </Panel>
+            <TiltCard>
+              <Panel title="MARKET EXPANSION">
+                <BarChart />
+              </Panel>
+            </TiltCard>
 
-            <Panel title="SYSTEM SIGNALS">
-              <Status />
-            </Panel>
+            <TiltCard>
+              <Panel title="GROWTH RATE">
+                <Counter value={result.growth} suffix="%" />
+              </Panel>
+            </TiltCard>
 
           </div>
         )}
 
       </div>
 
+      {/* ANIMATIONS */}
       <style>{`
         @keyframes glow {
           0% { box-shadow: 0 0 10px #22d3ee }
@@ -109,7 +115,7 @@ export default function Home() {
 
         @keyframes pulse {
           0% { transform: scale(1); opacity: 0.7 }
-          50% { transform: scale(1.15); opacity: 1 }
+          50% { transform: scale(1.2); opacity: 1 }
           100% { transform: scale(1); opacity: 0.7 }
         }
 
@@ -125,6 +131,33 @@ export default function Home() {
 
 /* ================= COMPONENTS ================= */
 
+/* 🔥 3D TILT CARD */
+function TiltCard({ children }) {
+  const [style, setStyle] = useState({})
+
+  return (
+    <div
+      style={{ ...tilt, ...style }}
+      onMouseMove={(e) => {
+        const rect = e.currentTarget.getBoundingClientRect()
+        const x = e.clientX - rect.left
+        const y = e.clientY - rect.top
+
+        const rotateX = -(y - rect.height / 2) / 15
+        const rotateY = (x - rect.width / 2) / 15
+
+        setStyle({
+          transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`
+        })
+      }}
+      onMouseLeave={() => setStyle({ transform: "rotateX(0) rotateY(0)" })}
+    >
+      {children}
+    </div>
+  )
+}
+
+/* PANEL */
 function Panel({ title, children }) {
   return (
     <div style={panel}>
@@ -134,14 +167,35 @@ function Panel({ title, children }) {
   )
 }
 
-/* 🔵 HOLOGRAPHIC RING */
-function HolographicChart({ value }) {
+/* 🧠 HOLOGRAM */
+function Holo({ value }) {
   return (
-    <div style={holoWrap}>
-      <div style={ringOuter}></div>
-      <div style={ringMid}></div>
-      <div style={ringInner}></div>
+    <div style={holo}>
+      <div style={ring}></div>
       <div style={center}>{value}</div>
+    </div>
+  )
+}
+
+/* 💰 COUNTER */
+function Counter({ value, prefix = "", suffix = "" }) {
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    let i = 0
+    const interval = setInterval(() => {
+      i += value / 30
+      if (i >= value) {
+        i = value
+        clearInterval(interval)
+      }
+      setCount(Math.floor(i))
+    }, 30)
+  }, [value])
+
+  return (
+    <div style={counter}>
+      {prefix}{count}{suffix}
     </div>
   )
 }
@@ -152,13 +206,13 @@ function LineChart() {
     <svg viewBox="0 0 300 120" style={{ width: "100%" }}>
       <polyline
         fill="none"
-        stroke="url(#grad)"
+        stroke="url(#g)"
         strokeWidth="3"
-        points="0,100 50,85 100,60 150,50 200,35 250,20 300,10"
+        points="0,100 60,80 120,60 180,40 240,20 300,10"
         style={{ filter: "drop-shadow(0 0 15px #22d3ee)" }}
       />
       <defs>
-        <linearGradient id="grad">
+        <linearGradient id="g">
           <stop offset="0%" stopColor="#22d3ee" />
           <stop offset="100%" stopColor="#a855f7" />
         </linearGradient>
@@ -169,7 +223,7 @@ function LineChart() {
 
 /* 📊 BARS */
 function BarChart() {
-  const data = [40, 80, 110, 140]
+  const data = [50, 80, 120, 150]
 
   return (
     <div style={bars}>
@@ -178,30 +232,10 @@ function BarChart() {
           height: d,
           flex: 1,
           borderRadius: 8,
-          background: "linear-gradient(180deg,#22d3ee,#a855f7)",
-          boxShadow: "0 0 25px #22d3ee"
+          background: "linear-gradient(#22d3ee,#a855f7)",
+          boxShadow: "0 0 20px #22d3ee"
         }} />
       ))}
-    </div>
-  )
-}
-
-/* STATUS */
-function Status() {
-  return (
-    <div style={{ display: "grid", gap: 10 }}>
-      <Stat label="AI Engine" value="ACTIVE" />
-      <Stat label="Market Signal" value="STRONG" />
-      <Stat label="Competition" value="MEDIUM" />
-    </div>
-  )
-}
-
-function Stat({ label, value }) {
-  return (
-    <div style={statBox}>
-      <span>{label}</span>
-      <span style={{ color: "#22d3ee" }}>{value}</span>
     </div>
   )
 }
@@ -234,18 +268,17 @@ const grid = {
   opacity: 0.2
 }
 
-const content = { position: "relative", padding: 16 }
+const content = { padding: 16 }
 
 const header = {
   display: "flex",
   gap: 10,
-  alignItems: "center",
   marginBottom: 20
 }
 
 const logoMain = { color: "#22d3ee", fontWeight: 900 }
 const logoSub = { color: "#a855f7" }
-const logo = { display: "flex", gap: 6, fontSize: 18 }
+const logo = { display: "flex", gap: 6 }
 
 const search = {
   flex: 1,
@@ -257,22 +290,20 @@ const search = {
 }
 
 const icon = {
-  width: 42,
-  height: 42,
+  width: 40,
+  height: 40,
   borderRadius: "50%",
   background: "linear-gradient(#22d3ee,#a855f7)",
   display: "flex",
   alignItems: "center",
-  justifyContent: "center",
-  boxShadow: "0 0 20px #22d3ee"
+  justifyContent: "center"
 }
 
 const hero = {
   padding: 24,
   borderRadius: 24,
-  background: "rgba(0,0,0,0.6)",
-  marginBottom: 20,
-  border: "1px solid rgba(168,85,247,0.3)"
+  background: "rgba(255,255,255,0.05)",
+  backdropFilter: "blur(20px)"
 }
 
 const gradientText = {
@@ -281,7 +312,7 @@ const gradientText = {
   color: "transparent"
 }
 
-const title = { fontSize: 32, marginBottom: 10 }
+const title = { fontSize: 34 }
 const subtitle = { opacity: 0.7, marginBottom: 10 }
 
 const input = {
@@ -300,7 +331,6 @@ const cta = {
   borderRadius: 16,
   background: "linear-gradient(90deg,#22d3ee,#a855f7,#ec4899)",
   border: "none",
-  fontWeight: "bold",
   animation: "glow 2s infinite"
 }
 
@@ -314,59 +344,35 @@ const scan = {
 const dashboard = {
   display: "grid",
   gap: 14,
+  marginTop: 20,
   gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))"
 }
 
 const panel = {
   padding: 18,
   borderRadius: 18,
-  background: "rgba(0,0,0,0.65)",
-  border: "1px solid rgba(168,85,247,0.3)"
+  background: "rgba(255,255,255,0.05)",
+  backdropFilter: "blur(20px)"
 }
 
 const panelTitle = {
-  marginBottom: 12,
-  color: "#22d3ee",
-  fontSize: 14
+  marginBottom: 10,
+  color: "#22d3ee"
 }
 
-const statBox = {
-  display: "flex",
-  justifyContent: "space-between",
-  padding: 8,
-  background: "rgba(255,255,255,0.05)",
-  borderRadius: 8
-}
-
-const holoWrap = {
-  width: 130,
-  height: 130,
+const holo = {
+  width: 120,
+  height: 120,
   margin: "auto",
   position: "relative"
 }
 
-const ringOuter = {
+const ring = {
   position: "absolute",
   inset: 0,
   borderRadius: "50%",
   border: "2px solid #22d3ee",
-  animation: "spin 8s linear infinite"
-}
-
-const ringMid = {
-  position: "absolute",
-  inset: 18,
-  borderRadius: "50%",
-  border: "2px solid #a855f7",
-  animation: "spin 5s linear infinite reverse"
-}
-
-const ringInner = {
-  position: "absolute",
-  inset: 35,
-  borderRadius: "50%",
-  border: "2px solid #ec4899",
-  animation: "pulse 2s infinite"
+  animation: "spin 6s linear infinite"
 }
 
 const center = {
@@ -380,7 +386,17 @@ const center = {
 
 const bars = {
   display: "flex",
-  gap: 8,
-  height: 130,
+  gap: 6,
+  height: 140,
   alignItems: "flex-end"
+}
+
+const counter = {
+  fontSize: 28,
+  marginBottom: 10,
+  color: "#22d3ee"
+}
+
+const tilt = {
+  transition: "transform 0.2s ease"
 }
