@@ -3,66 +3,80 @@
 export default function Home() {
   return (
     <div style={{
+      minHeight: "100vh",
       background: "#020617",
       color: "white",
-      minHeight: "100vh",
-      padding: 20,
-      fontFamily: "system-ui"
+      fontFamily: "'Orbitron', system-ui",
+      padding: 16
     }}>
 
       {/* HEADER */}
       <div style={{
-        display: "flex",
-        justifyContent: "space-between",
         marginBottom: 20
       }}>
         <h1 style={{
-          background: "linear-gradient(90deg,#22d3ee,#a855f7,#ec4899)",
-          WebkitBackgroundClip: "text",
-          color: "transparent"
+          fontSize: 18,
+          letterSpacing: 2,
+          color: "#22d3ee"
         }}>
           TOGARA TECH
         </h1>
 
-        <div style={{ color: "#94a3b8" }}>
-          AI SaaS Idea Generator
+        <div style={{
+          fontSize: 12,
+          color: "#94a3b8"
+        }}>
+          AI SaaS IDEA ENGINE
         </div>
       </div>
 
-      {/* GRID */}
+      {/* MAIN GRID */}
       <div style={{
         display: "grid",
-        gridTemplateColumns: "1fr",
-        gap: 20
+        gap: 16
       }}>
 
-        {/* PANEL 1 */}
-        <Panel title="WHAT THIS DOES">
-          <img
-            src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485"
-            style={{ width: "100%", borderRadius: 12 }}
-          />
-          <p style={{ marginTop: 10 }}>
-            AI evaluates your idea using market signals and data patterns
-          </p>
+        {/* HERO METRICS */}
+        <Panel>
+          <h2 style={{
+            fontSize: 20,
+            background: "linear-gradient(90deg,#22d3ee,#a855f7,#ec4899)",
+            WebkitBackgroundClip: "text",
+            color: "transparent"
+          }}>
+            $1.3 TRILLION MARKET
+          </h2>
+
+          <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginTop: 10,
+            fontSize: 12
+          }}>
+            <Stat label="Growth" value="18.7%" />
+            <Stat label="Market" value="$307B" />
+            <Stat label="AI Size" value="$3.6T" />
+          </div>
         </Panel>
 
-        {/* PANEL 2 */}
-        <Panel title="KEY METRICS">
-          <Metrics />
+        {/* FLYWHEEL */}
+        <Panel title="AI FLYWHEEL">
+          <CircleDiagram />
         </Panel>
 
-        {/* PANEL 3 */}
-        <Panel title="MARKET DATA">
-          <img
-            src="https://images.unsplash.com/photo-1535223289827-42f1e9919769"
-            style={{ width: "100%", borderRadius: 12 }}
-          />
+        {/* COMPARISON */}
+        <Panel title="WHY THIS WINS">
+          <Checklist />
         </Panel>
 
-        {/* PANEL 4 */}
-        <Panel title="PRICING">
-          <Pricing />
+        {/* REVENUE */}
+        <Panel title="REVENUE">
+          <BarChart />
+        </Panel>
+
+        {/* TECH STACK */}
+        <Panel title="STACK">
+          <StackIcons />
         </Panel>
 
       </div>
@@ -71,83 +85,134 @@ export default function Home() {
   )
 }
 
+/* PANEL */
 function Panel({ title, children }) {
   return (
     <div style={{
+      padding: 16,
       borderRadius: 20,
-      padding: 20,
-      background: "rgba(255,255,255,0.05)",
+      background: "linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))",
       border: "1px solid rgba(168,85,247,0.3)",
-      boxShadow: "0 0 30px rgba(168,85,247,0.2)"
+      boxShadow: "0 0 30px rgba(168,85,247,0.25)"
     }}>
-      <h3 style={{
-        marginBottom: 10,
-        color: "#22d3ee"
-      }}>
-        {title}
-      </h3>
+      {title && (
+        <div style={{
+          fontSize: 12,
+          marginBottom: 10,
+          color: "#22d3ee"
+        }}>
+          {title}
+        </div>
+      )}
       {children}
     </div>
   )
 }
 
-function Metrics() {
+/* STAT */
+function Stat({ label, value }) {
+  return (
+    <div>
+      <div style={{ color: "#94a3b8" }}>{label}</div>
+      <div style={{ color: "#22d3ee", fontWeight: "bold" }}>
+        {value}
+      </div>
+    </div>
+  )
+}
+
+/* BAR CHART */
+function BarChart() {
+  const data = [30, 60, 80, 120, 160]
+
   return (
     <div style={{
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr",
-      gap: 10
+      display: "flex",
+      alignItems: "flex-end",
+      height: 120,
+      gap: 6
     }}>
-      {[
-        ["Idea Score", "82"],
-        ["Demand", "78"],
-        ["Monetization", "74"],
-        ["Market Size", "€2.4B"]
-      ].map(([label, value]) => (
-        <div key={label} style={{
-          padding: 10,
-          borderRadius: 12,
-          background: "rgba(255,255,255,0.05)"
+      {data.map((d, i) => (
+        <div key={i} style={{
+          flex: 1,
+          height: d,
+          background: "linear-gradient(#22d3ee,#a855f7)",
+          borderRadius: 4,
+          boxShadow: "0 0 10px #22d3ee"
+        }} />
+      ))}
+    </div>
+  )
+}
+
+/* CIRCLE DIAGRAM */
+function CircleDiagram() {
+  return (
+    <div style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: 140
+    }}>
+      <div style={{
+        width: 100,
+        height: 100,
+        borderRadius: "50%",
+        border: "2px solid #22d3ee",
+        boxShadow: "0 0 20px #22d3ee",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+      }}>
+        AI
+      </div>
+    </div>
+  )
+}
+
+/* CHECKLIST */
+function Checklist() {
+  const items = [
+    "AI Idea Discovery",
+    "Real-time Validation",
+    "Auto Build",
+    "Growth Engine"
+  ]
+
+  return (
+    <div style={{ display: "grid", gap: 6 }}>
+      {items.map((i) => (
+        <div key={i} style={{
+          display: "flex",
+          justifyContent: "space-between"
         }}>
-          <div style={{ fontSize: 12, color: "#94a3b8" }}>{label}</div>
-          <div style={{
-            fontSize: 18,
-            fontWeight: "bold",
-            color: "#22d3ee"
-          }}>
-            {value}
-          </div>
+          <span>{i}</span>
+          <span style={{ color: "#22c55e" }}>✔</span>
         </div>
       ))}
     </div>
   )
 }
 
-function Pricing() {
-  return (
-    <div style={{
-      display: "grid",
-      gap: 10
-    }}>
-      <Card title="Free" desc="Idea scoring + basic insights" />
-      <Card title="Pro" desc="€50 + €10/mo\nAdvanced analysis + suggestions" />
-      <Card title="Elite" desc="€2000 + €100/mo\nFull business + deployment" highlight />
-    </div>
-  )
-}
+/* STACK ICONS */
+function StackIcons() {
+  const items = ["Next.js", "React", "AI", "Stripe"]
 
-function Card({ title, desc, highlight }) {
   return (
     <div style={{
-      padding: 15,
-      borderRadius: 15,
-      background: highlight
-        ? "linear-gradient(120deg,#22d3ee,#a855f7)"
-        : "rgba(255,255,255,0.05)",
-      color: highlight ? "black" : "white"
+      display: "flex",
+      gap: 10,
+      flexWrap: "wrap"
     }}>
-      <strong>{title}</strong>
-      <p style={{ whiteSpace: "pre-line" }}>{desc}</p>
+      {items.map((i) => (
+        <div key={i} style={{
+          padding: 10,
+          borderRadius: 10,
+          background: "rgba(255,255,255,0.05)"
+        }}>
+          {i}
+        </div>
+      ))}
     </div>
   )
 }
