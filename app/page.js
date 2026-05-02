@@ -22,78 +22,105 @@ export default function Home() {
   return (
     <div style={{
       minHeight: "100vh",
+      background: "linear-gradient(135deg, #020617, #0f172a)",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      background: "#0f172a",
-      color: "white",
-      padding: 20
+      padding: 20,
+      color: "white"
     }}>
       <div style={{
         width: "100%",
-        maxWidth: 500,
-        textAlign: "center"
+        maxWidth: 520
       }}>
 
-        <h1 style={{
-          fontSize: 32,
-          fontWeight: "bold",
-          marginBottom: 10
+        {/* HEADER */}
+        <div style={{ textAlign: "center", marginBottom: 40 }}>
+          <h1 style={{
+            fontSize: 36,
+            fontWeight: 700,
+            marginBottom: 10
+          }}>
+            Validate Your SaaS Idea
+          </h1>
+
+          <p style={{
+            color: "#94a3b8",
+            fontSize: 16
+          }}>
+            Instantly know if your idea can make money
+          </p>
+        </div>
+
+        {/* INPUT CARD */}
+        <div style={{
+          background: "rgba(255,255,255,0.03)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          borderRadius: 16,
+          padding: 20,
+          backdropFilter: "blur(10px)"
         }}>
-          AI SaaS Validator
-        </h1>
 
-        <p style={{
-          color: "#94a3b8",
-          marginBottom: 30
-        }}>
-          Validate your idea in seconds
-        </p>
+          <textarea
+            value={idea}
+            onChange={(e) => setIdea(e.target.value)}
+            placeholder="e.g. AI tool that writes cold emails for SaaS founders..."
+            rows={3}
+            style={{
+              width: "100%",
+              padding: 15,
+              borderRadius: 12,
+              border: "1px solid #334155",
+              background: "#020617",
+              color: "white",
+              marginBottom: 15,
+              resize: "none"
+            }}
+          />
 
-        <input
-          value={idea}
-          onChange={(e) => setIdea(e.target.value)}
-          placeholder="Enter your SaaS idea..."
-          style={{
-            width: "100%",
-            padding: 15,
-            borderRadius: 10,
-            border: "1px solid #334155",
-            marginBottom: 15,
-            background: "#020617",
-            color: "white"
-          }}
-        />
+          <button
+            onClick={analyze}
+            style={{
+              width: "100%",
+              padding: 15,
+              borderRadius: 12,
+              border: "none",
+              background: "linear-gradient(135deg, #22c55e, #06b6d4)",
+              color: "black",
+              fontWeight: "bold",
+              fontSize: 16,
+              cursor: "pointer"
+            }}
+          >
+            {loading ? "Analyzing..." : "Analyze Idea"}
+          </button>
+        </div>
 
-        <button
-          onClick={analyze}
-          style={{
-            width: "100%",
-            padding: 15,
-            borderRadius: 10,
-            border: "none",
-            background: "#06b6d4",
-            color: "black",
-            fontWeight: "bold",
-            cursor: "pointer"
-          }}
-        >
-          {loading ? "Analyzing..." : "Analyze Idea"}
-        </button>
-
+        {/* RESULT */}
         {result && (
           <div style={{
-            marginTop: 30,
+            marginTop: 25,
             padding: 20,
-            borderRadius: 10,
-            background: "#020617",
-            border: "1px solid #334155",
-            textAlign: "left",
-            whiteSpace: "pre-wrap"
+            borderRadius: 16,
+            background: "rgba(255,255,255,0.03)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            backdropFilter: "blur(10px)",
+            whiteSpace: "pre-wrap",
+            lineHeight: 1.6
           }}>
             {result}
           </div>
         )}
+
+        {/* FOOTER */}
+        <div style={{
+          marginTop: 30,
+          textAlign: "center",
+          color: "#64748b",
+          fontSize: 12
+        }}>
+          Built by Togara Hess
+        </div>
 
       </div>
     </div>
