@@ -1,13 +1,15 @@
 "use client"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 export default function Home() {
+  const [active, setActive] = useState("dashboard")
+
   return (
     <div style={{
       minHeight: "100vh",
       background: "#020617",
       color: "white",
-      fontFamily: "'Orbitron', system-ui",
+      fontFamily: "system-ui",
       padding: 16
     }}>
 
@@ -20,91 +22,162 @@ export default function Home() {
       }}>
         <Logo />
 
-        <div style={{
-          fontSize: 11,
-          color: "#94a3b8",
-          letterSpacing: 1
-        }}>
-          AI AUTONOMOUS SAAS ENGINE
+        <div style={{ fontSize: 11, color: "#94a3b8" }}>
+          AUTONOMOUS SAAS ENGINE
         </div>
       </div>
 
-      {/* HERO IMAGE */}
+      {/* NAV IMAGE BUTTONS */}
       <div style={{
-        marginBottom: 20,
-        borderRadius: 20,
-        overflow: "hidden",
-        boxShadow: "0 0 40px rgba(168,85,247,0.4)"
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))",
+        gap: 12,
+        marginBottom: 20
       }}>
-        <img
-          src="https://images.unsplash.com/photo-1639762681057-408e52192e55?q=80&w=1400&auto=format&fit=crop"
-          style={{ width: "100%" }}
+        <NavCard
+          img="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=600"
+          label="Dashboard"
+          onClick={() => setActive("dashboard")}
+        />
+        <NavCard
+          img="https://images.unsplash.com/photo-1639322537228-f710d846310a?q=80&w=600"
+          label="AI Engine"
+          onClick={() => setActive("ai")}
+        />
+        <NavCard
+          img="https://images.unsplash.com/photo-1639762681057-408e52192e55?q=80&w=600"
+          label="Analytics"
+          onClick={() => setActive("analytics")}
+        />
+        <NavCard
+          img="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=600"
+          label="Growth"
+          onClick={() => setActive("growth")}
         />
       </div>
 
-      {/* HERO TEXT */}
-      <div style={{ marginBottom: 20 }}>
-        <h2 style={{
-          fontSize: 32,
-          fontWeight: 800,
-          background: "linear-gradient(90deg,#22d3ee,#a855f7,#ec4899)",
-          WebkitBackgroundClip: "text",
-          color: "transparent"
-        }}>
-          Turn Ideas Into Autonomous SaaS
-        </h2>
-
-        <p style={{ color: "#94a3b8" }}>
-          The first AI system that validates, builds and scales SaaS ideas automatically.
-        </p>
-      </div>
-
-      {/* GRID */}
-      <div style={{
-        display: "grid",
-        gap: 16,
-        gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))"
-      }}>
-
-        <Panel title="$1.3 TRILLION OPPORTUNITY">
-          <RowStats />
-        </Panel>
-
-        <Panel title="AI FLYWHEEL">
-          <CircleDiagram />
-        </Panel>
-
-        <Panel title="WHY THIS WINS">
-          <Checklist />
-        </Panel>
-
-        <Panel title="TRACTION">
-          <BarChart />
-        </Panel>
-
-        <Panel title="UNIT ECONOMICS">
-          <Metrics />
-        </Panel>
-
-        <Panel title="GROWTH FUNNEL">
-          <Funnel />
-        </Panel>
-
-        <Panel title="DATA PIPELINE">
-          <Pipeline />
-        </Panel>
-
-        <Panel title="TECH STACK">
-          <Stack />
-        </Panel>
-
-      </div>
+      {/* CONTENT SWITCH */}
+      {active === "dashboard" && <Dashboard />}
+      {active === "ai" && <AIEngine />}
+      {active === "analytics" && <Analytics />}
+      {active === "growth" && <Growth />}
 
     </div>
   )
 }
 
 
+
+
+/* ================= NAV IMAGE BUTTON ================= */
+
+function NavCard({ img, label, onClick }) {
+  const [hover, setHover] = useState(false)
+
+  return (
+    <div
+      onClick={onClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        position: "relative",
+        borderRadius: 16,
+        overflow: "hidden",
+        cursor: "pointer",
+        boxShadow: "0 0 25px rgba(168,85,247,0.4)"
+      }}
+    >
+      <img src={img} style={{ width: "100%", height: 120, objectFit: "cover" }} />
+
+      {/* OVERLAY */}
+      <div style={{
+        position: "absolute",
+        inset: 0,
+        background: hover
+          ? "rgba(0,0,0,0.7)"
+          : "rgba(0,0,0,0.2)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        transition: "0.3s"
+      }}>
+        {hover && (
+          <span style={{
+            fontWeight: "bold",
+            fontSize: 14,
+            letterSpacing: 1,
+            color: "#22d3ee"
+          }}>
+            {label}
+          </span>
+        )}
+      </div>
+    </div>
+  )
+}
+
+
+
+
+/* ================= SECTIONS ================= */
+
+function Dashboard() {
+  return (
+    <Section title="SYSTEM OVERVIEW">
+      <Metrics />
+      <BarChart />
+    </Section>
+  )
+}
+
+function AIEngine() {
+  return (
+    <Section title="AI ENGINE">
+      <p style={{ color: "#94a3b8" }}>
+        Generates, validates and scores SaaS ideas autonomously.
+      </p>
+      <Circle />
+    </Section>
+  )
+}
+
+function Analytics() {
+  return (
+    <Section title="ANALYTICS">
+      <Metrics />
+    </Section>
+  )
+}
+
+function Growth() {
+  return (
+    <Section title="GROWTH SYSTEM">
+      <Funnel />
+    </Section>
+  )
+}
+
+
+
+
+/* ================= SECTION WRAPPER ================= */
+
+function Section({ title, children }) {
+  return (
+    <div style={{
+      padding: 16,
+      borderRadius: 20,
+      background: "rgba(255,255,255,0.05)",
+      border: "1px solid rgba(168,85,247,0.3)",
+      boxShadow: "0 0 30px rgba(168,85,247,0.25)"
+    }}>
+      <h3 style={{ color: "#22d3ee", marginBottom: 10 }}>{title}</h3>
+      <div style={{ display: "grid", gap: 16 }}>
+        {children}
+      </div>
+    </div>
+  )
+}
 
 
 
@@ -113,122 +186,48 @@ export default function Home() {
 
 function Logo() {
   return (
-    <svg width="160" height="40" viewBox="0 0 300 80">
-      <defs>
-        <linearGradient id="grad" x1="0%" y1="0%" x2="100%">
-          <stop offset="0%" stopColor="#22d3ee" />
-          <stop offset="50%" stopColor="#a855f7" />
-          <stop offset="100%" stopColor="#ec4899" />
-        </linearGradient>
-
-        <filter id="glow">
-          <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-          <feMerge>
-            <feMergeNode in="coloredBlur"/>
-            <feMergeNode in="SourceGraphic"/>
-          </feMerge>
-        </filter>
-      </defs>
-
-      <text
-        x="0"
-        y="50"
-        fontSize="42"
-        fontWeight="800"
-        fill="url(#grad)"
-        filter="url(#glow)"
-        style={{ letterSpacing: "4px" }}
-      >
-        TOGARA
-      </text>
-    </svg>
-  )
-}
-
-function Panel({ title, children }) {
-  return (
     <div style={{
-      padding: 16,
-      borderRadius: 20,
-      background: "linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))",
-      border: "1px solid rgba(168,85,247,0.3)",
-      boxShadow: "0 0 30px rgba(168,85,247,0.25)"
+      fontWeight: "bold",
+      fontSize: 18,
+      background: "linear-gradient(90deg,#22d3ee,#a855f7,#ec4899)",
+      WebkitBackgroundClip: "text",
+      color: "transparent"
     }}>
-      <div style={{
-        fontSize: 12,
-        marginBottom: 10,
-        color: "#22d3ee"
-      }}>
-        {title}
-      </div>
-      {children}
+      TOGARA
     </div>
   )
 }
 
-function RowStats() {
-  const stats = [
-    ["Growth", "18.7"],
-    ["Market", "307"],
-    ["Startups", "10000"],
-    ["AI Size", "3600"]
+function Metrics() {
+  const data = [
+    ["Idea Score", "82"],
+    ["Demand", "78"],
+    ["Monetization", "74"],
+    ["Market", "€2.4B"]
   ]
 
   return (
     <div style={{
       display: "grid",
       gridTemplateColumns: "repeat(2,1fr)",
-      gap: 8
+      gap: 10
     }}>
-      {stats.map(([l, v]) => (
-        <Stat key={l} label={l} value={v} />
+      {data.map(([l, v]) => (
+        <div key={l} style={{
+          padding: 10,
+          borderRadius: 12,
+          background: "rgba(255,255,255,0.05)"
+        }}>
+          <div style={{ fontSize: 11, color: "#94a3b8" }}>{l}</div>
+          <div style={{ color: "#22d3ee", fontWeight: "bold" }}>{v}</div>
+        </div>
       ))}
     </div>
   )
 }
 
-function Stat({ label, value }) {
-  return (
-    <div style={{
-      padding: 10,
-      borderRadius: 10,
-      background: "rgba(255,255,255,0.05)"
-    }}>
-      <div style={{ fontSize: 10, color: "#94a3b8" }}>{label}</div>
-      <div style={{ color: "#22d3ee", fontWeight: "bold" }}>
-        <AnimatedNumber value={value} />
-      </div>
-    </div>
-  )
-}
-
-function AnimatedNumber({ value }) {
-  const [display, setDisplay] = useState(0)
-
-  useEffect(() => {
-    let start = 0
-    const end = parseInt(value)
-    const duration = 600
-
-    const step = Math.ceil(end / (duration / 16))
-
-    const timer = setInterval(() => {
-      start += step
-      if (start >= end) {
-        start = end
-        clearInterval(timer)
-      }
-      setDisplay(start)
-    }, 16)
-
-    return () => clearInterval(timer)
-  }, [value])
-
-  return <span>{display}</span>
-}
-
 function BarChart() {
-  const data = [30, 60, 80, 120, 160]
+  const data = [20, 40, 60, 90, 120]
 
   return (
     <div style={{
@@ -250,86 +249,20 @@ function BarChart() {
   )
 }
 
-function CircleDiagram() {
-  return (
-    <div style={{
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      height: 140
-    }}>
-      <div style={{
-        width: 110,
-        height: 110,
-        borderRadius: "50%",
-        border: "2px solid #22d3ee",
-        boxShadow: "0 0 25px #22d3ee",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center"
-      }}>
-        AI
-      </div>
-    </div>
-  )
-}
-
-function Checklist() {
-  const items = [
-    "AI Idea Discovery",
-    "Real-time Validation",
-    "Auto Build",
-    "Growth Engine"
-  ]
-
-  return (
-    <div style={{ display: "grid", gap: 6 }}>
-      {items.map((i) => (
-        <div key={i} style={{
-          display: "flex",
-          justifyContent: "space-between"
-        }}>
-          <span>{i}</span>
-          <span style={{ color: "#22c55e" }}>✔</span>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function Metrics() {
-  const m = [
-    ["LTV/CAC", "8"],
-    ["ARPU", "23"],
-    ["Margin", "82"],
-    ["Payback", "1"]
-  ]
-
-  return (
-    <div style={{
-      display: "grid",
-      gridTemplateColumns: "repeat(2,1fr)",
-      gap: 8
-    }}>
-      {m.map(([l, v]) => (
-        <Stat key={l} label={l} value={v} />
-      ))}
-    </div>
-  )
-}
-
 function Funnel() {
+  const steps = [
+    ["Awareness", "100%"],
+    ["Signup", "12%"],
+    ["Activated", "62%"],
+    ["Paid", "4.9%"]
+  ]
+
   return (
     <div style={{ display: "grid", gap: 6 }}>
-      {[
-        ["Awareness", "100%"],
-        ["Signup", "12%"],
-        ["Activated", "62%"],
-        ["Paid", "4.9%"]
-      ].map(([l, v]) => (
+      {steps.map(([l, v]) => (
         <div key={l} style={{
-          padding: 6,
-          borderRadius: 6,
+          padding: 8,
+          borderRadius: 8,
           background: "rgba(255,255,255,0.05)",
           display: "flex",
           justifyContent: "space-between"
@@ -342,46 +275,25 @@ function Funnel() {
   )
 }
 
-function Pipeline() {
-  const steps = ["Collect", "Clean", "Extract", "Embed", "Score", "Generate"]
-
+function Circle() {
   return (
     <div style={{
       display: "flex",
-      flexWrap: "wrap",
-      gap: 6
+      justifyContent: "center",
+      marginTop: 20
     }}>
-      {steps.map(s => (
-        <div key={s} style={{
-          padding: "6px 10px",
-          borderRadius: 10,
-          background: "rgba(255,255,255,0.05)"
-        }}>
-          {s}
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function Stack() {
-  const items = ["Next.js", "React", "AI", "Stripe", "Supabase"]
-
-  return (
-    <div style={{
-      display: "flex",
-      flexWrap: "wrap",
-      gap: 6
-    }}>
-      {items.map(i => (
-        <div key={i} style={{
-          padding: 8,
-          borderRadius: 10,
-          background: "rgba(255,255,255,0.05)"
-        }}>
-          {i}
-        </div>
-      ))}
+      <div style={{
+        width: 120,
+        height: 120,
+        borderRadius: "50%",
+        border: "2px solid #22d3ee",
+        boxShadow: "0 0 30px #22d3ee",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center"
+      }}>
+        AI
+      </div>
     </div>
   )
 }
