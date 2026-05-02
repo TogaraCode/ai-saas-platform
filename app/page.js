@@ -3,23 +3,23 @@ import { useState } from "react"
 
 export default function Home() {
   const [idea, setIdea] = useState("")
-  const [result, setResult] = useState("")
+  const [result, setResult] = useState(false)
   const [loading, setLoading] = useState(false)
 
   async function analyze() {
     setLoading(true)
-    setResult("")
+    setResult(false)
 
     const res = await fetch("/api/analyze", {
       method: "POST",
       body: JSON.stringify({ idea })
     })
 
-    const data = await res.json()
+    await res.json()
 
-    // fake delay for premium feel
+    // simulate premium AI delay
     setTimeout(() => {
-      setResult(data.result)
+      setResult(true)
       setLoading(false)
     }, 1200)
   }
@@ -36,7 +36,7 @@ export default function Home() {
     }}>
       <div style={{ width: "100%", maxWidth: 520 }}>
 
-        {/* HEADLINE */}
+        {/* HEADER */}
         <div style={{ textAlign: "center", marginBottom: 30 }}>
           <h1 style={{
             fontSize: 36,
@@ -105,7 +105,7 @@ export default function Home() {
           </button>
         </div>
 
-        {/* LOADING STATE */}
+        {/* LOADING */}
         {loading && (
           <div style={{
             marginTop: 25,
@@ -119,59 +119,74 @@ export default function Home() {
           </div>
         )}
 
-        {/* RESULT CARD */}
-     {result && (
-  <div style={{
-    marginTop: 25,
-    padding: 20,
-    borderRadius: 16,
-    background: "rgba(255,255,255,0.03)",
-    border: "1px solid rgba(255,255,255,0.08)",
-    lineHeight: 1.6
-  }}>
+        {/* RESULT UI */}
+        {result && (
+          <div style={{
+            marginTop: 25,
+            padding: 20,
+            borderRadius: 16,
+            background: "rgba(255,255,255,0.03)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            lineHeight: 1.6
+          }}>
 
-    {/* SCORE */}
-    <div style={{
-      fontSize: 28,
-      fontWeight: "bold",
-      marginBottom: 10,
-      color: "#22c55e"
-    }}>
-      ⭐ Score: 7.8 / 10
+            {/* SCORE */}
+            <div style={{
+              fontSize: 28,
+              fontWeight: "bold",
+              marginBottom: 10,
+              color: "#22c55e"
+            }}>
+              ⭐ Score: 7.8 / 10
+            </div>
+
+            {/* BREAKDOWN */}
+            <div style={{ marginBottom: 10 }}>
+              <strong>📈 Market Potential:</strong><br />
+              High demand among SaaS founders looking for automation tools.
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+              <strong>💰 Monetization:</strong><br />
+              Subscription model (€19–€49/month) with strong upsell potential.
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+              <strong>⚠️ Risk:</strong><br />
+              Competitive market with existing players.
+            </div>
+
+            <div style={{ marginBottom: 15 }}>
+              <strong>🚀 Improvement:</strong><br />
+              Focus on niche targeting + better personalization.
+            </div>
+
+            {/* PAYWALL HOOK */}
+            <div style={{
+              marginTop: 15,
+              padding: 15,
+              borderRadius: 12,
+              background: "rgba(34,197,94,0.1)",
+              border: "1px solid rgba(34,197,94,0.3)",
+              textAlign: "center"
+            }}>
+              🔒 Unlock full AI breakdown + winning strategy
+            </div>
+
+          </div>
+        )}
+
+        {/* FOOTER */}
+        <div style={{
+          marginTop: 25,
+          textAlign: "center",
+          fontSize: 12,
+          color: "#64748b"
+        }}>
+          Built by Togara Hess
+        </div>
+
+      </div>
     </div>
-
-    {/* BREAKDOWN */}
-    <div style={{ marginBottom: 10 }}>
-      <strong>📈 Market Potential:</strong><br />
-      High demand among SaaS founders looking for outbound automation.
-    </div>
-
-    <div style={{ marginBottom: 10 }}>
-      <strong>💰 Monetization:</strong><br />
-      Subscription model (€19–€49/month) with strong upsell potential.
-    </div>
-
-    <div style={{ marginBottom: 10 }}>
-      <strong>⚠️ Risk:</strong><br />
-      Highly competitive space with many existing tools.
-    </div>
-
-    <div style={{ marginBottom: 15 }}>
-      <strong>🚀 Improvement:</strong><br />
-      Focus on niche personalization + LinkedIn integration.
-    </div>
-
-    {/* PAYWALL HOOK */}
-    <div style={{
-      marginTop: 15,
-      padding: 15,
-      borderRadius: 12,
-      background: "rgba(34,197,94,0.1)",
-      border: "1px solid rgba(34,197,94,0.3)",
-      textAlign: "center"
-    }}>
-      🔒 Unlock full AI breakdown + winning strategy
-    </div>
-
-  </div>
-)}
+  )
+}
