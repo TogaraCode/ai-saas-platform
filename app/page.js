@@ -1,259 +1,180 @@
 "use client"
-import { useEffect, useRef, useState } from "react"
+import { useState } from "react"
 
 export default function Home() {
   const [idea, setIdea] = useState("")
-  const [bursts, setBursts] = useState([])
-  const [scrollY, setScrollY] = useState(0)
-  const beamRef = useRef(null)
-
-  // pointer glow
-  useEffect(() => {
-    const move = (e) => {
-      if (!beamRef.current) return
-      beamRef.current.style.left = e.clientX + "px"
-      beamRef.current.style.top = e.clientY + "px"
-    }
-    window.addEventListener("mousemove", move)
-    return () => window.removeEventListener("mousemove", move)
-  }, [])
-
-  // scroll tracking (parallax)
-  useEffect(() => {
-    const onScroll = () => setScrollY(window.scrollY)
-    window.addEventListener("scroll", onScroll)
-    return () => window.removeEventListener("scroll", onScroll)
-  }, [])
-
-  // click burst
-  function handleClick(e) {
-    const burst = {
-      x: e.clientX,
-      y: e.clientY,
-      id: Date.now()
-    }
-    setBursts((b) => [...b, burst])
-    setTimeout(() => {
-      setBursts((b) => b.filter((x) => x.id !== burst.id))
-    }, 600)
-  }
 
   return (
-    <div onClick={handleClick} style={{
-      minHeight: "200vh",
-      overflowX: "hidden",
-      position: "relative",
-      fontFamily: "system-ui",
+    <div style={{
+      minHeight: "100vh",
       background: "#020617",
-      color: "white"
+      color: "white",
+      fontFamily: "system-ui"
     }}>
 
-      {/* 🌌 BACKGROUND LAYERS */}
-      <div style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 0,
-        transform: `translateY(${scrollY * 0.2}px)`,
-        background: `
-          radial-gradient(circle at 20% 30%, #06b6d4, transparent 40%),
-          radial-gradient(circle at 80% 70%, #a855f7, transparent 40%),
-          radial-gradient(circle at 50% 50%, #0ea5e9, #020617)
-        `,
-        filter: "blur(60px)",
-        opacity: 0.6
-      }}/>
-
-      {/* 🧠 GRID FLOOR */}
-      <div style={{
-        position: "fixed",
-        bottom: 0,
-        width: "100%",
-        height: "40%",
-        zIndex: 0,
-        transform: `perspective(600px) rotateX(60deg) translateY(${scrollY * 0.1}px)`,
-        background: `
-          repeating-linear-gradient(to right, rgba(34,211,238,0.2) 0px, transparent 2px, transparent 40px),
-          repeating-linear-gradient(to top, rgba(168,85,247,0.2) 0px, transparent 2px, transparent 40px)
-        `
-      }}/>
-
-      {/* ⚡ POINTER LIGHT */}
-      <div ref={beamRef} style={{
-        position: "fixed",
-        width: 220,
-        height: 220,
-        zIndex: 2,
-        pointerEvents: "none",
-        background: "radial-gradient(circle, rgba(34,211,238,0.3), transparent 70%)",
-        transform: "translate(-50%, -50%)",
-        mixBlendMode: "screen"
-      }}/>
-
-      {/* 💥 BURSTS */}
-      {bursts.map((b) => (
-        <div key={b.id} style={{
-          position: "fixed",
-          left: b.x,
-          top: b.y,
-          width: 120,
-          height: 120,
-          borderRadius: "50%",
-          background: "radial-gradient(circle,#22d3ee,transparent)",
-          transform: "translate(-50%,-50%)",
-          animation: "burst 0.6s ease-out"
-        }}/>
-      ))}
-
-      {/* 🌀 IMAGE TICKER */}
-      <div style={{
-        position: "fixed",
-        top: 0,
-        width: "100%",
-        zIndex: 1,
-        overflow: "hidden",
-        pointerEvents: "none"
+      {/* HERO */}
+      <section style={{
+        padding: 30,
+        textAlign: "center"
       }}>
-        <div style={{
-          display: "flex",
-          gap: 30,
-          animation: "ticker 30s linear infinite"
+        <h1 style={{
+          fontSize: 42,
+          fontWeight: 900,
+          background: "linear-gradient(90deg,#22d3ee,#a855f7,#ec4899)",
+          WebkitBackgroundClip: "text",
+          color: "transparent"
         }}>
+          Turn Ideas Into Money
+        </h1>
+
+        <p style={{ color: "#94a3b8", marginTop: 10 }}>
+          AI tells you if your idea is worth building
+        </p>
+
+        {/* HERO IMAGE */}
+        <img
+          src="https://source.unsplash.com/800x500/?cyberpunk,teen,technology"
+          style={{
+            width: "100%",
+            borderRadius: 20,
+            marginTop: 20,
+            boxShadow: "0 0 40px rgba(34,211,238,0.3)"
+          }}
+        />
+
+        {/* INPUT */}
+        <div style={{
+          marginTop: 20,
+          padding: 20,
+          borderRadius: 20,
+          background: "rgba(255,255,255,0.05)"
+        }}>
+          <textarea
+            value={idea}
+            onChange={(e) => setIdea(e.target.value)}
+            placeholder="Describe your idea..."
+            rows={3}
+            style={{
+              width: "100%",
+              padding: 12,
+              borderRadius: 10,
+              background: "#020617",
+              color: "white",
+              border: "1px solid #334155"
+            }}
+          />
+
+          <button style={{
+            marginTop: 15,
+            width: "100%",
+            padding: 14,
+            borderRadius: 12,
+            background: "linear-gradient(120deg,#22d3ee,#a855f7,#ec4899)",
+            color: "white",
+            fontWeight: "bold",
+            boxShadow: "0 0 30px rgba(168,85,247,0.6)"
+          }}>
+            ⚡ Analyze Idea
+          </button>
+        </div>
+      </section>
+
+      {/* WHAT IT DOES */}
+      <section style={{ padding: 30 }}>
+        <h2>What you get</h2>
+
+        <div style={{ display: "grid", gap: 15, marginTop: 15 }}>
           {[
-            "cyberpunk neon city",
-            "ai hologram",
-            "neural network glowing",
-            "futuristic interface",
-            "3d digital grid"
-          ].map((q, i) => (
-            <img
-              key={i}
-              src={`https://source.unsplash.com/300x200/?${q}`}
-              style={{
-                width: 140,
-                height: 90,
-                borderRadius: 12,
-                opacity: 0.8,
-                transform: "perspective(500px) rotateY(15deg)",
-                boxShadow: "0 0 30px #22d3ee"
-              }}
-            />
+            "📊 Probability score (will it work?)",
+            "💰 Revenue potential estimate",
+            "📈 Market demand signals",
+            "⚠️ Risk detection"
+          ].map((t, i) => (
+            <div key={i} style={{
+              padding: 15,
+              borderRadius: 15,
+              background: "rgba(255,255,255,0.05)"
+            }}>
+              {t}
+            </div>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* MAIN */}
-      <div style={{
-        position: "relative",
-        zIndex: 3,
-        padding: 20,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "100vh"
-      }}>
+      {/* VISUAL DASHBOARD */}
+      <section style={{ padding: 30 }}>
+        <img
+          src="https://source.unsplash.com/800x500/?futuristic,data,ai"
+          style={{
+            width: "100%",
+            borderRadius: 20,
+            boxShadow: "0 0 40px rgba(34,211,238,0.3)"
+          }}
+        />
+      </section>
+
+      {/* WHY DIFFERENT */}
+      <section style={{ padding: 30 }}>
+        <h2>Why this is different</h2>
+
+        <div style={{ display: "grid", gap: 10, marginTop: 15 }}>
+          <div>✔ AI + market signals</div>
+          <div>✔ Built for fast decision making</div>
+          <div>✔ No coding required</div>
+        </div>
+      </section>
+
+      {/* PRICING */}
+      <section style={{ padding: 30 }}>
+        <h2>Pricing</h2>
+
         <div style={{
-          maxWidth: 520,
-          width: "100%",
-          textAlign: "center"
+          display: "grid",
+          gap: 20,
+          marginTop: 20
         }}>
 
-          <h1 style={{
-            fontSize: 46,
-            fontWeight: 900,
-            textShadow: "0 0 40px #22d3ee"
-          }}>
-            AI SaaS Validator
-          </h1>
-
-          <p style={{ color: "#94a3b8" }}>
-            Enter the neon startup universe
-          </p>
-
-          {/* INPUT */}
-          <div style={{
-            marginTop: 30,
-            padding: 20,
-            borderRadius: 20,
-            background: "rgba(255,255,255,0.05)",
-            backdropFilter: "blur(20px)",
-            boxShadow: "0 0 60px rgba(34,211,238,0.3)"
-          }}>
-            <textarea
-              value={idea}
-              onChange={(e) => setIdea(e.target.value)}
-              placeholder="Your next billion € idea..."
-              rows={3}
-              style={{
-                width: "100%",
-                padding: 12,
-                borderRadius: 12,
-                background: "#020617",
-                border: "1px solid #334155",
-                color: "white"
-              }}
-            />
-
-            <button style={{
-              marginTop: 15,
-              width: "100%",
-              padding: 14,
-              borderRadius: 12,
-              background: "linear-gradient(90deg,#22c55e,#06b6d4,#a855f7)",
-              fontWeight: "bold",
-              color: "black",
-              boxShadow: "0 0 30px #22d3ee"
-            }}>
-              Analyze Idea
-            </button>
+          {/* FREE */}
+          <div style={card()}>
+            <h3>Free</h3>
+            <p>Idea score + basic insights</p>
           </div>
 
-          {/* FLOATING CARDS */}
-          <div style={{
-            marginTop: 40,
-            display: "grid",
-            gap: 20
-          }}>
-            {["Market AI", "Revenue Engine", "Risk Scanner"].map((item, i) => (
-              <div key={i}
-                style={{
-                  padding: 20,
-                  borderRadius: 20,
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  transition: "0.3s"
-                }}
-                onMouseMove={(e) => {
-                  const rect = e.currentTarget.getBoundingClientRect()
-                  const x = e.clientX - rect.left
-                  const y = e.clientY - rect.top
-                  e.currentTarget.style.transform =
-                    `perspective(600px) rotateX(${(y - rect.height/2)/10}deg) rotateY(${-(x - rect.width/2)/10}deg)`
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "none"
-                }}
-              >
-                {item}
-              </div>
-            ))}
+          {/* PRO */}
+          <div style={card()}>
+            <h3>Pro</h3>
+            <p>€50 + €10/mo</p>
+            <p>Deep analysis + 2 AI suggestions</p>
+          </div>
+
+          {/* ELITE */}
+          <div style={cardHighlight()}>
+            <h3>Elite</h3>
+            <p>€2000 + €100/mo</p>
+            <p>Full idea + business plan + deployment</p>
           </div>
 
         </div>
-      </div>
-
-      {/* ANIMATIONS */}
-      <style jsx>{`
-        @keyframes ticker {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-
-        @keyframes burst {
-          0% { opacity: 1; transform: scale(0.5); }
-          100% { opacity: 0; transform: scale(2); }
-        }
-      `}</style>
+      </section>
 
     </div>
   )
+}
+
+function card() {
+  return {
+    padding: 20,
+    borderRadius: 20,
+    background: "rgba(255,255,255,0.05)"
+  }
+}
+
+function cardHighlight() {
+  return {
+    padding: 20,
+    borderRadius: 20,
+    background: "linear-gradient(120deg,#22d3ee,#a855f7)",
+    color: "black",
+    fontWeight: "bold"
+  }
 }
