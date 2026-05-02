@@ -20,80 +20,80 @@ export default function Home() {
         <div style={header}>
           <div style={logo}>
             <span style={logoMain}>QUANTUM</span>
-            <span style={logoSub}>AI</span>
+            <span style={logoSub}>CORE</span>
           </div>
 
-          <input placeholder="Search startup ideas..." style={search} />
+          <input placeholder="Search ideas..." style={search} />
 
           <div style={icon}>⚡</div>
           <div style={icon}>👤</div>
         </div>
 
         {/* HERO */}
-        <TiltCard>
-          <div style={hero}>
-            <h1 style={title}>
-              <span style={gradientText}>PREDICT</span><br />
-              <span style={gradientText}>SUCCESS</span>
-            </h1>
+        <div style={hero}>
+          <h1 style={title}>
+            <span style={gradient}>BUILD LESS.</span><br/>
+            <span style={gradient}>WIN MORE.</span>
+          </h1>
 
-            <p style={subtitle}>
-              AI-powered SaaS validation engine
-            </p>
+          <p style={subtitle}>
+            AI predicts startup success using real-world signals
+          </p>
 
-            <input placeholder="Describe your idea..." style={input} />
+          <input placeholder="Describe your idea..." style={input} />
 
-            <button
-              style={cta}
-              onClick={() => {
-                setLoading(true)
-                setTimeout(() => {
-                  setLoading(false)
-                  setResult({
-                    score: 86,
-                    demand: 81,
-                    monetization: 76,
-                    revenue: 14890,
-                    growth: 24.6
-                  })
-                }, 1200)
-              }}
-            >
-              ⚡ ANALYZE
-            </button>
+          <button
+            style={cta}
+            onClick={() => {
+              setLoading(true)
+              setTimeout(() => {
+                setLoading(false)
+                setResult({
+                  score: 87,
+                  mrr: 14890,
+                  growth: 24.6,
+                  conversion: 23.6,
+                  ltv: 612,
+                  cac: 70
+                })
+              }, 1200)
+            }}
+          >
+            ⚡ ANALYZE
+          </button>
 
-            {loading && <div style={scan}></div>}
+          {loading && <div style={scan}></div>}
+        </div>
+
+        {/* KPI STRIP */}
+        {result && (
+          <div style={kpiRow}>
+            <KPI label="MRR" value={`€${result.mrr}`} />
+            <KPI label="Growth" value={`${result.growth}%`} />
+            <KPI label="Conversion" value={`${result.conversion}%`} />
+            <KPI label="LTV/CAC" value={(result.ltv / result.cac).toFixed(1) + "x"} />
           </div>
-        </TiltCard>
+        )}
 
         {/* DASHBOARD */}
         {result && (
           <div style={dashboard}>
 
-            <TiltCard>
-              <Panel title="CORE SCORE">
-                <Holo value={result.score} />
-              </Panel>
-            </TiltCard>
+            <Panel title="AI SCORE">
+              <Holo value={result.score} />
+            </Panel>
 
-            <TiltCard>
-              <Panel title="REVENUE TRACTION">
-                <Counter value={result.revenue} prefix="€" />
-                <LineChart />
-              </Panel>
-            </TiltCard>
+            <Panel title="REVENUE TREND">
+              <LineChart />
+            </Panel>
 
-            <TiltCard>
-              <Panel title="MARKET EXPANSION">
-                <BarChart />
-              </Panel>
-            </TiltCard>
+            <Panel title="GROWTH FUNNEL">
+              <Funnel />
+            </Panel>
 
-            <TiltCard>
-              <Panel title="GROWTH RATE">
-                <Counter value={result.growth} suffix="%" />
-              </Panel>
-            </TiltCard>
+            <Panel title="UNIT ECONOMICS">
+              <Economics ltv={result.ltv} cac={result.cac} />
+            </Panel>
 
           </div>
         )}
@@ -113,12 +113,6 @@ export default function Home() {
           to { transform: rotate(360deg) }
         }
 
-        @keyframes pulse {
-          0% { transform: scale(1); opacity: 0.7 }
-          50% { transform: scale(1.2); opacity: 1 }
-          100% { transform: scale(1); opacity: 0.7 }
-        }
-
         @keyframes scan {
           0% { transform: translateX(-100%) }
           100% { transform: translateX(100%) }
@@ -131,33 +125,15 @@ export default function Home() {
 
 /* ================= COMPONENTS ================= */
 
-/* 🔥 3D TILT CARD */
-function TiltCard({ children }) {
-  const [style, setStyle] = useState({})
-
+function KPI({ label, value }) {
   return (
-    <div
-      style={{ ...tilt, ...style }}
-      onMouseMove={(e) => {
-        const rect = e.currentTarget.getBoundingClientRect()
-        const x = e.clientX - rect.left
-        const y = e.clientY - rect.top
-
-        const rotateX = -(y - rect.height / 2) / 15
-        const rotateY = (x - rect.width / 2) / 15
-
-        setStyle({
-          transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`
-        })
-      }}
-      onMouseLeave={() => setStyle({ transform: "rotateX(0) rotateY(0)" })}
-    >
-      {children}
+    <div style={kpi}>
+      <div style={kpiValue}>{value}</div>
+      <div style={kpiLabel}>{label}</div>
     </div>
   )
 }
 
-/* PANEL */
 function Panel({ title, children }) {
   return (
     <div style={panel}>
@@ -167,7 +143,6 @@ function Panel({ title, children }) {
   )
 }
 
-/* 🧠 HOLOGRAM */
 function Holo({ value }) {
   return (
     <div style={holo}>
@@ -177,30 +152,6 @@ function Holo({ value }) {
   )
 }
 
-/* 💰 COUNTER */
-function Counter({ value, prefix = "", suffix = "" }) {
-  const [count, setCount] = useState(0)
-
-  useEffect(() => {
-    let i = 0
-    const interval = setInterval(() => {
-      i += value / 30
-      if (i >= value) {
-        i = value
-        clearInterval(interval)
-      }
-      setCount(Math.floor(i))
-    }, 30)
-  }, [value])
-
-  return (
-    <div style={counter}>
-      {prefix}{count}{suffix}
-    </div>
-  )
-}
-
-/* 📈 LINE */
 function LineChart() {
   return (
     <svg viewBox="0 0 300 120" style={{ width: "100%" }}>
@@ -208,8 +159,7 @@ function LineChart() {
         fill="none"
         stroke="url(#g)"
         strokeWidth="3"
-        points="0,100 60,80 120,60 180,40 240,20 300,10"
-        style={{ filter: "drop-shadow(0 0 15px #22d3ee)" }}
+        points="0,100 50,80 100,60 150,45 200,30 250,20 300,10"
       />
       <defs>
         <linearGradient id="g">
@@ -221,21 +171,34 @@ function LineChart() {
   )
 }
 
-/* 📊 BARS */
-function BarChart() {
-  const data = [50, 80, 120, 150]
+function Funnel() {
+  const steps = [
+    ["Awareness", "100%"],
+    ["Signup", "23%"],
+    ["Activated", "62%"],
+    ["Paid", "4.9%"]
+  ]
 
   return (
-    <div style={bars}>
-      {data.map((d, i) => (
-        <div key={i} style={{
-          height: d,
-          flex: 1,
-          borderRadius: 8,
-          background: "linear-gradient(#22d3ee,#a855f7)",
-          boxShadow: "0 0 20px #22d3ee"
-        }} />
+    <div style={{ display: "grid", gap: 8 }}>
+      {steps.map(([l, v], i) => (
+        <div key={i} style={funnelRow}>
+          <span>{l}</span>
+          <span style={{ color: "#22d3ee" }}>{v}</span>
+        </div>
       ))}
+    </div>
+  )
+}
+
+function Economics({ ltv, cac }) {
+  return (
+    <div style={{ display: "grid", gap: 10 }}>
+      <div>LTV: €{ltv}</div>
+      <div>CAC: €{cac}</div>
+      <div style={{ color: "#22d3ee" }}>
+        Ratio: {(ltv / cac).toFixed(1)}x
+      </div>
     </div>
   )
 }
@@ -303,22 +266,23 @@ const hero = {
   padding: 24,
   borderRadius: 24,
   background: "rgba(255,255,255,0.05)",
-  backdropFilter: "blur(20px)"
+  marginBottom: 20
 }
 
-const gradientText = {
+const gradient = {
   background: "linear-gradient(90deg,#22d3ee,#a855f7,#ec4899)",
   WebkitBackgroundClip: "text",
   color: "transparent"
 }
 
 const title = { fontSize: 34 }
-const subtitle = { opacity: 0.7, marginBottom: 10 }
+const subtitle = { opacity: 0.7 }
 
 const input = {
   width: "100%",
   padding: 14,
   borderRadius: 14,
+  marginTop: 10,
   marginBottom: 10,
   background: "rgba(0,0,0,0.4)",
   border: "1px solid rgba(255,255,255,0.2)",
@@ -341,18 +305,32 @@ const scan = {
   animation: "scan 1s infinite"
 }
 
+const kpiRow = {
+  display: "grid",
+  gridTemplateColumns: "repeat(4,1fr)",
+  gap: 10,
+  marginBottom: 20
+}
+
+const kpi = {
+  padding: 14,
+  borderRadius: 12,
+  background: "rgba(255,255,255,0.05)"
+}
+
+const kpiValue = { fontSize: 18, color: "#22d3ee" }
+const kpiLabel = { fontSize: 12, opacity: 0.6 }
+
 const dashboard = {
   display: "grid",
   gap: 14,
-  marginTop: 20,
   gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))"
 }
 
 const panel = {
   padding: 18,
   borderRadius: 18,
-  background: "rgba(255,255,255,0.05)",
-  backdropFilter: "blur(20px)"
+  background: "rgba(255,255,255,0.05)"
 }
 
 const panelTitle = {
@@ -384,19 +362,10 @@ const center = {
   fontSize: 26
 }
 
-const bars = {
+const funnelRow = {
   display: "flex",
-  gap: 6,
-  height: 140,
-  alignItems: "flex-end"
-}
-
-const counter = {
-  fontSize: 28,
-  marginBottom: 10,
-  color: "#22d3ee"
-}
-
-const tilt = {
-  transition: "transform 0.2s ease"
+  justifyContent: "space-between",
+  padding: 8,
+  background: "rgba(255,255,255,0.05)",
+  borderRadius: 8
 }
