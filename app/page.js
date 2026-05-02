@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 export default function Home() {
   const [idea, setIdea] = useState("")
@@ -10,183 +10,196 @@ export default function Home() {
     setLoading(true)
     setResult(false)
 
-    const res = await fetch("/api/analyze", {
-      method: "POST",
-      body: JSON.stringify({ idea })
-    })
-
-    await res.json()
-
-    // simulate premium AI delay
     setTimeout(() => {
       setResult(true)
       setLoading(false)
     }, 1200)
   }
 
+  // simple floating particles
+  const [particles, setParticles] = useState([])
+
+  useEffect(() => {
+    const arr = Array.from({ length: 20 }).map(() => ({
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      size: Math.random() * 4 + 2
+    }))
+    setParticles(arr)
+  }, [])
+
   return (
     <div style={{
       minHeight: "100vh",
-      background: "linear-gradient(135deg, #020617, #0f172a)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: 20,
-      color: "white"
+      background: "radial-gradient(circle at 30% 30%, #0ea5e9, #020617)",
+      color: "white",
+      overflow: "hidden",
+      position: "relative"
     }}>
-      <div style={{ width: "100%", maxWidth: 520 }}>
 
-        {/* HEADER */}
-        <div style={{ textAlign: "center", marginBottom: 30 }}>
+      {/* PARTICLES */}
+      {particles.map((p, i) => (
+        <div key={i} style={{
+          position: "absolute",
+          left: `${p.left}%`,
+          top: `${p.top}%`,
+          width: p.size,
+          height: p.size,
+          background: "#22c55e",
+          borderRadius: "50%",
+          opacity: 0.2
+        }} />
+      ))}
+
+      {/* MAIN */}
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 20,
+        minHeight: "100vh"
+      }}>
+
+        <div style={{
+          width: "100%",
+          maxWidth: 520,
+          textAlign: "center"
+        }}>
+
+          {/* HERO */}
           <h1 style={{
-            fontSize: 36,
-            fontWeight: 700,
-            marginBottom: 10
+            fontSize: 38,
+            fontWeight: 800,
+            marginBottom: 10,
+            textShadow: "0 0 20px rgba(34,197,94,0.5)"
           }}>
             Validate Your SaaS Idea
           </h1>
 
           <p style={{
             color: "#94a3b8",
-            fontSize: 16
+            marginBottom: 20
           }}>
             AI-powered validation in seconds
           </p>
 
+          {/* INPUT */}
           <div style={{
-            marginTop: 10,
-            fontSize: 13,
-            color: "#22c55e"
-          }}>
-            ● Used by founders to avoid bad ideas
-          </div>
-        </div>
-
-        {/* INPUT CARD */}
-        <div style={{
-          background: "rgba(255,255,255,0.03)",
-          border: "1px solid rgba(255,255,255,0.08)",
-          borderRadius: 16,
-          padding: 20,
-          backdropFilter: "blur(10px)"
-        }}>
-          <textarea
-            value={idea}
-            onChange={(e) => setIdea(e.target.value)}
-            placeholder="e.g. AI tool that writes cold emails for SaaS founders..."
-            rows={3}
-            style={{
-              width: "100%",
-              padding: 15,
-              borderRadius: 12,
-              border: "1px solid #334155",
-              background: "#020617",
-              color: "white",
-              marginBottom: 15,
-              resize: "none"
-            }}
-          />
-
-          <button
-            onClick={analyze}
-            style={{
-              width: "100%",
-              padding: 15,
-              borderRadius: 12,
-              border: "none",
-              background: "linear-gradient(135deg, #22c55e, #06b6d4)",
-              color: "black",
-              fontWeight: "bold",
-              fontSize: 16,
-              cursor: "pointer"
-            }}
-          >
-            {loading ? "Analyzing with AI..." : "Analyze Idea"}
-          </button>
-        </div>
-
-        {/* LOADING */}
-        {loading && (
-          <div style={{
-            marginTop: 25,
+            background: "rgba(255,255,255,0.05)",
+            borderRadius: 20,
             padding: 20,
-            borderRadius: 16,
-            background: "rgba(255,255,255,0.03)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            textAlign: "center"
-          }}>
-            🧠 AI is analyzing your idea...
-          </div>
-        )}
-
-        {/* RESULT UI */}
-        {result && (
-          <div style={{
-            marginTop: 25,
-            padding: 20,
-            borderRadius: 16,
-            background: "rgba(255,255,255,0.03)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            lineHeight: 1.6
+            backdropFilter: "blur(12px)",
+            boxShadow: "0 0 40px rgba(0,0,0,0.5)"
           }}>
 
-            {/* SCORE */}
-            <div style={{
-              fontSize: 28,
-              fontWeight: "bold",
-              marginBottom: 10,
-              color: "#22c55e"
-            }}>
-              ⭐ Score: 7.8 / 10
-            </div>
+            <textarea
+              value={idea}
+              onChange={(e) => setIdea(e.target.value)}
+              placeholder="Describe your SaaS idea..."
+              rows={3}
+              style={{
+                width: "100%",
+                padding: 15,
+                borderRadius: 12,
+                border: "none",
+                background: "#020617",
+                color: "white",
+                marginBottom: 15
+              }}
+            />
 
-            {/* BREAKDOWN */}
-            <div style={{ marginBottom: 10 }}>
-              <strong>📈 Market Potential:</strong><br />
-              High demand among SaaS founders looking for automation tools.
-            </div>
-
-            <div style={{ marginBottom: 10 }}>
-              <strong>💰 Monetization:</strong><br />
-              Subscription model (€19–€49/month) with strong upsell potential.
-            </div>
-
-            <div style={{ marginBottom: 10 }}>
-              <strong>⚠️ Risk:</strong><br />
-              Competitive market with existing players.
-            </div>
-
-            <div style={{ marginBottom: 15 }}>
-              <strong>🚀 Improvement:</strong><br />
-              Focus on niche targeting + better personalization.
-            </div>
-
-            {/* PAYWALL HOOK */}
-            <div style={{
-              marginTop: 15,
-              padding: 15,
-              borderRadius: 12,
-              background: "rgba(34,197,94,0.1)",
-              border: "1px solid rgba(34,197,94,0.3)",
-              textAlign: "center"
-            }}>
-              🔒 Unlock full AI breakdown + winning strategy
-            </div>
-
+            <button
+              onClick={analyze}
+              style={{
+                width: "100%",
+                padding: 15,
+                borderRadius: 12,
+                background: "linear-gradient(135deg,#22c55e,#06b6d4)",
+                color: "black",
+                fontWeight: "bold",
+                fontSize: 16,
+                boxShadow: "0 0 20px rgba(34,197,94,0.5)"
+              }}
+            >
+              {loading ? "Analyzing..." : "Analyze Idea"}
+            </button>
           </div>
-        )}
 
-        {/* FOOTER */}
-        <div style={{
-          marginTop: 25,
-          textAlign: "center",
-          fontSize: 12,
-          color: "#64748b"
-        }}>
-          Built by Togara Hess
+          {/* LOADING */}
+          {loading && (
+            <div style={{
+              marginTop: 20,
+              padding: 20,
+              borderRadius: 16,
+              background: "rgba(255,255,255,0.05)"
+            }}>
+              🧠 AI is thinking...
+            </div>
+          )}
+
+          {/* RESULT */}
+          {result && (
+            <div style={{
+              marginTop: 20,
+              padding: 20,
+              borderRadius: 16,
+              background: "rgba(255,255,255,0.05)",
+              transform: "perspective(800px) rotateX(2deg)"
+            }}>
+
+              <div style={{
+                fontSize: 26,
+                fontWeight: "bold",
+                color: "#22c55e"
+              }}>
+                ⭐ Score: 7.8 / 10
+              </div>
+
+              <p style={{ marginTop: 10 }}>
+                High demand SaaS idea with strong monetization potential.
+              </p>
+
+              <div style={{
+                marginTop: 15,
+                padding: 10,
+                borderRadius: 10,
+                background: "rgba(34,197,94,0.1)"
+              }}>
+                🔒 Unlock full strategy
+              </div>
+            </div>
+          )}
+
         </div>
-
       </div>
+
+      {/* SCROLL SECTION */}
+      <div style={{
+        padding: 40,
+        textAlign: "center"
+      }}>
+        <h2 style={{ fontSize: 24 }}>Why this works</h2>
+
+        <div style={{
+          display: "grid",
+          gap: 20,
+          marginTop: 20
+        }}>
+
+          {["Market Analysis", "Monetization", "Risk Detection"].map((item, i) => (
+            <div key={i} style={{
+              padding: 20,
+              borderRadius: 16,
+              background: "rgba(255,255,255,0.05)",
+              transform: "translateZ(20px)",
+              transition: "0.3s"
+            }}>
+              {item}
+            </div>
+          ))}
+        </div>
+      </div>
+
     </div>
   )
 }
