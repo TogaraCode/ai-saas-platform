@@ -1,180 +1,153 @@
 "use client"
-import { useState } from "react"
 
 export default function Home() {
-  const [idea, setIdea] = useState("")
-
   return (
     <div style={{
-      minHeight: "100vh",
       background: "#020617",
       color: "white",
+      minHeight: "100vh",
+      padding: 20,
       fontFamily: "system-ui"
     }}>
 
-      {/* HERO */}
-      <section style={{
-        padding: 30,
-        textAlign: "center"
+      {/* HEADER */}
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        marginBottom: 20
       }}>
         <h1 style={{
-          fontSize: 42,
-          fontWeight: 900,
           background: "linear-gradient(90deg,#22d3ee,#a855f7,#ec4899)",
           WebkitBackgroundClip: "text",
           color: "transparent"
         }}>
-          Turn Ideas Into Money
+          TOGARA TECH
         </h1>
 
-        <p style={{ color: "#94a3b8", marginTop: 10 }}>
-          AI tells you if your idea is worth building
-        </p>
+        <div style={{ color: "#94a3b8" }}>
+          AI SaaS Idea Generator
+        </div>
+      </div>
 
-        {/* HERO IMAGE */}
-        <img
-          src="https://source.unsplash.com/800x500/?cyberpunk,teen,technology"
-          style={{
-            width: "100%",
-            borderRadius: 20,
-            marginTop: 20,
-            boxShadow: "0 0 40px rgba(34,211,238,0.3)"
-          }}
-        />
+      {/* GRID */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "1fr",
+        gap: 20
+      }}>
 
-        {/* INPUT */}
-        <div style={{
-          marginTop: 20,
-          padding: 20,
-          borderRadius: 20,
-          background: "rgba(255,255,255,0.05)"
-        }}>
-          <textarea
-            value={idea}
-            onChange={(e) => setIdea(e.target.value)}
-            placeholder="Describe your idea..."
-            rows={3}
-            style={{
-              width: "100%",
-              padding: 12,
-              borderRadius: 10,
-              background: "#020617",
-              color: "white",
-              border: "1px solid #334155"
-            }}
+        {/* PANEL 1 */}
+        <Panel title="WHAT THIS DOES">
+          <img
+            src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485"
+            style={{ width: "100%", borderRadius: 12 }}
           />
+          <p style={{ marginTop: 10 }}>
+            AI evaluates your idea using market signals and data patterns
+          </p>
+        </Panel>
 
-          <button style={{
-            marginTop: 15,
-            width: "100%",
-            padding: 14,
-            borderRadius: 12,
-            background: "linear-gradient(120deg,#22d3ee,#a855f7,#ec4899)",
-            color: "white",
-            fontWeight: "bold",
-            boxShadow: "0 0 30px rgba(168,85,247,0.6)"
-          }}>
-            ⚡ Analyze Idea
-          </button>
-        </div>
-      </section>
+        {/* PANEL 2 */}
+        <Panel title="KEY METRICS">
+          <Metrics />
+        </Panel>
 
-      {/* WHAT IT DOES */}
-      <section style={{ padding: 30 }}>
-        <h2>What you get</h2>
+        {/* PANEL 3 */}
+        <Panel title="MARKET DATA">
+          <img
+            src="https://images.unsplash.com/photo-1535223289827-42f1e9919769"
+            style={{ width: "100%", borderRadius: 12 }}
+          />
+        </Panel>
 
-        <div style={{ display: "grid", gap: 15, marginTop: 15 }}>
-          {[
-            "📊 Probability score (will it work?)",
-            "💰 Revenue potential estimate",
-            "📈 Market demand signals",
-            "⚠️ Risk detection"
-          ].map((t, i) => (
-            <div key={i} style={{
-              padding: 15,
-              borderRadius: 15,
-              background: "rgba(255,255,255,0.05)"
-            }}>
-              {t}
-            </div>
-          ))}
-        </div>
-      </section>
+        {/* PANEL 4 */}
+        <Panel title="PRICING">
+          <Pricing />
+        </Panel>
 
-      {/* VISUAL DASHBOARD */}
-      <section style={{ padding: 30 }}>
-        <img
-          src="https://source.unsplash.com/800x500/?futuristic,data,ai"
-          style={{
-            width: "100%",
-            borderRadius: 20,
-            boxShadow: "0 0 40px rgba(34,211,238,0.3)"
-          }}
-        />
-      </section>
-
-      {/* WHY DIFFERENT */}
-      <section style={{ padding: 30 }}>
-        <h2>Why this is different</h2>
-
-        <div style={{ display: "grid", gap: 10, marginTop: 15 }}>
-          <div>✔ AI + market signals</div>
-          <div>✔ Built for fast decision making</div>
-          <div>✔ No coding required</div>
-        </div>
-      </section>
-
-      {/* PRICING */}
-      <section style={{ padding: 30 }}>
-        <h2>Pricing</h2>
-
-        <div style={{
-          display: "grid",
-          gap: 20,
-          marginTop: 20
-        }}>
-
-          {/* FREE */}
-          <div style={card()}>
-            <h3>Free</h3>
-            <p>Idea score + basic insights</p>
-          </div>
-
-          {/* PRO */}
-          <div style={card()}>
-            <h3>Pro</h3>
-            <p>€50 + €10/mo</p>
-            <p>Deep analysis + 2 AI suggestions</p>
-          </div>
-
-          {/* ELITE */}
-          <div style={cardHighlight()}>
-            <h3>Elite</h3>
-            <p>€2000 + €100/mo</p>
-            <p>Full idea + business plan + deployment</p>
-          </div>
-
-        </div>
-      </section>
+      </div>
 
     </div>
   )
 }
 
-function card() {
-  return {
-    padding: 20,
-    borderRadius: 20,
-    background: "rgba(255,255,255,0.05)"
-  }
+function Panel({ title, children }) {
+  return (
+    <div style={{
+      borderRadius: 20,
+      padding: 20,
+      background: "rgba(255,255,255,0.05)",
+      border: "1px solid rgba(168,85,247,0.3)",
+      boxShadow: "0 0 30px rgba(168,85,247,0.2)"
+    }}>
+      <h3 style={{
+        marginBottom: 10,
+        color: "#22d3ee"
+      }}>
+        {title}
+      </h3>
+      {children}
+    </div>
+  )
 }
 
-function cardHighlight() {
-  return {
-    padding: 20,
-    borderRadius: 20,
-    background: "linear-gradient(120deg,#22d3ee,#a855f7)",
-    color: "black",
-    fontWeight: "bold"
-  }
+function Metrics() {
+  return (
+    <div style={{
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      gap: 10
+    }}>
+      {[
+        ["Idea Score", "82"],
+        ["Demand", "78"],
+        ["Monetization", "74"],
+        ["Market Size", "€2.4B"]
+      ].map(([label, value]) => (
+        <div key={label} style={{
+          padding: 10,
+          borderRadius: 12,
+          background: "rgba(255,255,255,0.05)"
+        }}>
+          <div style={{ fontSize: 12, color: "#94a3b8" }}>{label}</div>
+          <div style={{
+            fontSize: 18,
+            fontWeight: "bold",
+            color: "#22d3ee"
+          }}>
+            {value}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function Pricing() {
+  return (
+    <div style={{
+      display: "grid",
+      gap: 10
+    }}>
+      <Card title="Free" desc="Idea scoring + basic insights" />
+      <Card title="Pro" desc="€50 + €10/mo\nAdvanced analysis + suggestions" />
+      <Card title="Elite" desc="€2000 + €100/mo\nFull business + deployment" highlight />
+    </div>
+  )
+}
+
+function Card({ title, desc, highlight }) {
+  return (
+    <div style={{
+      padding: 15,
+      borderRadius: 15,
+      background: highlight
+        ? "linear-gradient(120deg,#22d3ee,#a855f7)"
+        : "rgba(255,255,255,0.05)",
+      color: highlight ? "black" : "white"
+    }}>
+      <strong>{title}</strong>
+      <p style={{ whiteSpace: "pre-line" }}>{desc}</p>
+    </div>
+  )
 }
