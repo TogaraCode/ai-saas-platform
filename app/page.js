@@ -8,6 +8,7 @@ export default function Home() {
 
   async function analyze() {
     setLoading(true)
+    setResult("")
 
     const res = await fetch("/api/analyze", {
       method: "POST",
@@ -15,8 +16,12 @@ export default function Home() {
     })
 
     const data = await res.json()
-    setResult(data.result)
-    setLoading(false)
+
+    // fake delay for premium feel
+    setTimeout(() => {
+      setResult(data.result)
+      setLoading(false)
+    }, 1200)
   }
 
   return (
@@ -29,13 +34,10 @@ export default function Home() {
       padding: 20,
       color: "white"
     }}>
-      <div style={{
-        width: "100%",
-        maxWidth: 520
-      }}>
+      <div style={{ width: "100%", maxWidth: 520 }}>
 
-        {/* HEADER */}
-        <div style={{ textAlign: "center", marginBottom: 40 }}>
+        {/* HEADLINE */}
+        <div style={{ textAlign: "center", marginBottom: 30 }}>
           <h1 style={{
             fontSize: 36,
             fontWeight: 700,
@@ -48,8 +50,16 @@ export default function Home() {
             color: "#94a3b8",
             fontSize: 16
           }}>
-            Instantly know if your idea can make money
+            AI-powered validation in seconds
           </p>
+
+          <div style={{
+            marginTop: 10,
+            fontSize: 13,
+            color: "#22c55e"
+          }}>
+            ● Used by founders to avoid bad ideas
+          </div>
         </div>
 
         {/* INPUT CARD */}
@@ -60,7 +70,6 @@ export default function Home() {
           padding: 20,
           backdropFilter: "blur(10px)"
         }}>
-
           <textarea
             value={idea}
             onChange={(e) => setIdea(e.target.value)}
@@ -92,11 +101,25 @@ export default function Home() {
               cursor: "pointer"
             }}
           >
-            {loading ? "Analyzing..." : "Analyze Idea"}
+            {loading ? "Analyzing with AI..." : "Analyze Idea"}
           </button>
         </div>
 
-        {/* RESULT */}
+        {/* LOADING STATE */}
+        {loading && (
+          <div style={{
+            marginTop: 25,
+            padding: 20,
+            borderRadius: 16,
+            background: "rgba(255,255,255,0.03)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            textAlign: "center"
+          }}>
+            🧠 AI is analyzing your idea...
+          </div>
+        )}
+
+        {/* RESULT CARD */}
         {result && (
           <div style={{
             marginTop: 25,
@@ -104,20 +127,27 @@ export default function Home() {
             borderRadius: 16,
             background: "rgba(255,255,255,0.03)",
             border: "1px solid rgba(255,255,255,0.08)",
-            backdropFilter: "blur(10px)",
-            whiteSpace: "pre-wrap",
             lineHeight: 1.6
           }}>
-            {result}
+            <div style={{
+              fontWeight: "bold",
+              marginBottom: 10
+            }}>
+              Analysis Result:
+            </div>
+
+            <div style={{ whiteSpace: "pre-wrap" }}>
+              {result}
+            </div>
           </div>
         )}
 
-        {/* FOOTER */}
+        {/* SOCIAL PROOF */}
         <div style={{
-          marginTop: 30,
+          marginTop: 25,
           textAlign: "center",
-          color: "#64748b",
-          fontSize: 12
+          fontSize: 12,
+          color: "#64748b"
         }}>
           Built by Togara Hess
         </div>
