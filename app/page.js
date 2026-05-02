@@ -1,14 +1,24 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 export default function Home() {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
+  const [width, setWidth] = useState(0)
+
+  useEffect(() => {
+    const update = () => setWidth(window.innerWidth)
+    update()
+    window.addEventListener("resize", update)
+    return () => window.removeEventListener("resize", update)
+  }, [])
+
+  const isMobile = width < 600
+  const isTablet = width >= 600 && width < 1000
 
   return (
     <div style={root}>
 
-      {/* BACKGROUND */}
       <div style={bg}></div>
       <div style={gridOverlay}></div>
 
@@ -16,17 +26,24 @@ export default function Home() {
 
         {/* HEADER */}
         <div style={header}>
-          <div style={logo}>TOGARA.AI</div>
+          <div style={logo}>
+            <span style={logoMain}>NEXUS</span>
+            <span style={logoSub}>//CORE</span>
+          </div>
 
-          <input placeholder="Search ideas..." style={search} />
+          {!isMobile && (
+            <input placeholder="Search ideas..." style={search} />
+          )}
 
           <div style={icon}>⚡</div>
           <div style={icon}>👤</div>
         </div>
 
-        {/* HERO / INPUT */}
+        {/* HERO */}
         <div style={hero}>
-          <h1 style={title}>AI SAAS ENGINE</h1>
+          <h1 style={title}>
+            BUILD • VALIDATE • SCALE
+          </h1>
 
           <input placeholder="Describe your idea..." style={input} />
 
@@ -55,30 +72,44 @@ export default function Home() {
 
         {/* METRICS */}
         {result && (
-          <div style={metricsGrid}>
-            <MetricCard label="IDEA SCORE" value={result.score} />
+          <div style={{
+            ...metricsGrid,
+            gridTemplateColumns: isMobile
+              ? "1fr"
+              : isTablet
+              ? "repeat(2,1fr)"
+              : "repeat(4,1fr)"
+          }}>
+            <MetricCard label="IDEA" value={result.score} />
             <MetricCard label="DEMAND" value={result.demand} />
-            <MetricCard label="MONETIZATION" value={result.monetization} />
+            <MetricCard label="MONEY" value={result.monetization} />
             <MetricCard label="GROWTH" value={result.growth} />
           </div>
         )}
 
-        {/* DASHBOARD GRID */}
-        <div style={dashboardGrid}>
+        {/* DASHBOARD */}
+        <div style={{
+          ...dashboardGrid,
+          gridTemplateColumns: isMobile
+            ? "1fr"
+            : isTablet
+            ? "repeat(2,1fr)"
+            : "repeat(2,1fr)"
+        }}>
 
-          <Panel title="REVENUE TRAJECTORY">
+          <Panel title="TRAJECTORY">
             <LineChart />
           </Panel>
 
-          <Panel title="MARKET BREAKDOWN">
+          <Panel title="MARKET">
             <BarChart />
           </Panel>
 
-          <Panel title="CONVERSION FUNNEL">
+          <Panel title="FUNNEL">
             <Funnel />
           </Panel>
 
-          <Panel title="SYSTEM STATUS">
+          <Panel title="STATUS">
             <Status />
           </Panel>
 
@@ -86,7 +117,6 @@ export default function Home() {
 
       </div>
 
-      {/* ANIMATIONS */}
       <style>{`
         @keyframes glow {
           0% { box-shadow: 0 0 10px #22d3ee }
@@ -185,21 +215,17 @@ function Funnel() {
 function Status() {
   return (
     <div style={{ display: "grid", gap: 8 }}>
-      <div style={statusGood}>AI Engine: ONLINE</div>
-      <div style={statusGood}>Market Scan: ACTIVE</div>
-      <div style={statusWarn}>Competition: MEDIUM</div>
-      <div style={statusGood}>Revenue Potential: HIGH</div>
+      <div style={statusGood}>AI: ONLINE</div>
+      <div style={statusGood}>SCAN: ACTIVE</div>
+      <div style={statusWarn}>COMP: MEDIUM</div>
+      <div style={statusGood}>REV: HIGH</div>
     </div>
   )
 }
 
 /* STYLES */
 
-const root = {
-  minHeight: "100vh",
-  color: "white",
-  fontFamily: "system-ui"
-}
+const root = { minHeight: "100vh", color: "white", fontFamily: "system-ui" }
 
 const bg = {
   position: "fixed",
@@ -208,8 +234,7 @@ const bg = {
     radial-gradient(circle at 20% 20%, rgba(168,85,247,0.25), transparent),
     radial-gradient(circle at 80% 40%, rgba(34,211,238,0.25), transparent),
     #020617
-  `,
-  zIndex: 0
+  `
 }
 
 const gridOverlay = {
@@ -223,24 +248,26 @@ const gridOverlay = {
   opacity: 0.2
 }
 
-const content = {
-  position: "relative",
-  zIndex: 1,
-  padding: 16
-}
+const content = { position: "relative", padding: 16 }
 
 const header = {
   display: "flex",
+  alignItems: "center",
   gap: 10,
   marginBottom: 20
 }
 
-const logo = {
+const logo = { display: "flex", gap: 6, alignItems: "center" }
+
+const logoMain = {
   fontWeight: "bold",
-  fontSize: 20,
-  background: "linear-gradient(90deg,#22d3ee,#a855f7,#ec4899)",
-  WebkitBackgroundClip: "text",
-  color: "transparent"
+  fontSize: 18,
+  color: "#22d3ee"
+}
+
+const logoSub = {
+  fontSize: 14,
+  color: "#a855f7"
 }
 
 const search = {
@@ -266,14 +293,10 @@ const hero = {
   padding: 20,
   borderRadius: 20,
   background: "rgba(0,0,0,0.6)",
-  border: "1px solid rgba(168,85,247,0.4)",
   marginBottom: 20
 }
 
-const title = {
-  fontSize: 28,
-  marginBottom: 10
-}
+const title = { fontSize: 24, marginBottom: 10 }
 
 const input = {
   width: "100%",
@@ -289,9 +312,9 @@ const cta = {
   width: "100%",
   padding: 14,
   borderRadius: 14,
-  background: "linear-gradient(90deg,#22d3ee,#a855f7,#ec4899)",
-  color: "white",
+  background: "linear-gradient(90deg,#22d3ee,#a855f7)",
   border: "none",
+  color: "white",
   animation: "glow 2s infinite"
 }
 
@@ -302,53 +325,29 @@ const scan = {
   animation: "scan 1s infinite"
 }
 
-const metricsGrid = {
-  display: "grid",
-  gridTemplateColumns: "repeat(2,1fr)",
-  gap: 10,
-  marginBottom: 20
-}
+const metricsGrid = { display: "grid", gap: 10, marginBottom: 20 }
 
 const metricCard = {
   padding: 16,
   borderRadius: 16,
-  background: "rgba(0,0,0,0.6)",
-  border: "1px solid rgba(168,85,247,0.4)"
+  background: "rgba(0,0,0,0.6)"
 }
 
-const metricLabel = {
-  fontSize: 12,
-  opacity: 0.7
-}
+const metricLabel = { fontSize: 12, opacity: 0.7 }
 
-const metricValue = {
-  fontSize: 20,
-  color: "#22d3ee"
-}
+const metricValue = { fontSize: 20, color: "#22d3ee" }
 
-const dashboardGrid = {
-  display: "grid",
-  gap: 14
-}
+const dashboardGrid = { display: "grid", gap: 14 }
 
 const panel = {
   padding: 16,
   borderRadius: 16,
-  background: "rgba(0,0,0,0.6)",
-  border: "1px solid rgba(168,85,247,0.4)"
+  background: "rgba(0,0,0,0.6)"
 }
 
-const panelTitle = {
-  marginBottom: 10,
-  color: "#22d3ee"
-}
+const panelTitle = { marginBottom: 10, color: "#22d3ee" }
 
-const bars = {
-  display: "flex",
-  alignItems: "flex-end",
-  gap: 6,
-  height: 120
-}
+const bars = { display: "flex", alignItems: "flex-end", gap: 6, height: 120 }
 
 const funnelRow = {
   display: "flex",
@@ -358,10 +357,5 @@ const funnelRow = {
   background: "rgba(255,255,255,0.05)"
 }
 
-const statusGood = {
-  color: "#22d3ee"
-}
-
-const statusWarn = {
-  color: "#facc15"
-}
+const statusGood = { color: "#22d3ee" }
+const statusWarn = { color: "#facc15" }
