@@ -1,57 +1,83 @@
+import fetch from "node-fetch"
+import { saveIdea } from "../../../lib/store"
+
+async function getTrendData(query) {
+  try {
+    const res = await fetch(
+      `https://serpapi.com/search.json?q=${encodeURIComponent(query)}&engine=google_trends&api_key=${process.env.SERP_API_KEY}`
+    )
+    const data = await res.json()
+    if (!data.interest_over_time) return [50, 60, 70, 80, 90]
+    return data.interest_over_time.timeline_data.map(p => p.values[0].value)
+  } catch {
+    return [50, 60, 70, 80, 90]
+  }
+}
+
+async function getRedditSentiment(query) {
+  try {
+    const res = await fetch(`https://www.reddit.com/search.json?q=${query}&limit=10`)
+    const json = await res.json()
+    const posts = json.data.children
+    if (!posts.length) return 50
+    const score = posts.reduce((a, p) => a + p.data.score, 0) / posts.length
+    return Math.min(100, Math.max(20, score))
+  } catch {
+    return 50
+  }
+}
+
+async function getCompetitors(query) {
+  try {
+    const res = await fetch(
+      `https://serpapi.com/search.json?q=${encodeURIComponent(query + " SaaS")}&api_key=${process.env.SERP_API_KEY}`
+    )
+    const data = await res.json()
+    return (data.organic_results || [])
+      .slice(0, 5)
+      .map(r => r.title.split(" ")[0])
+  } catch {
+    return ["Notion", "Slack", "Airtable"]
+  }
+}
+
 export async function POST(req) {
   const { idea } = await req.json()
 
-  const text = idea.toLowerCase()
+  const [trend, sentiment, competitors] = await Promise.all([
+    getTrendData(idea),
+    getRedditSentiment(idea),
+    getCompetitors(idea)
+  ])
 
-  // BASIC SIGNAL DETECTION
-  const signals = {
-    ai: text.includes("ai"),
-    marketplace: text.includes("marketplace"),
-    saas: text.includes("saas"),
-    b2b: text.includes("b2b"),
-    consumer: text.includes("consumer") || text.includes("app"),
+  const demand = Math.round(trend.reduce((a, b) => a + b, 0) / trend.length)
+  const competition = competitors.length * 15
+  const monetization = sentiment > 60 ? 70 : 50
+
+  const score = Math.max(
+    0,
+    Math.min(
+      100,
+      Math.round((demand * 0.4 + sentiment * 0.3 + monetization * 0.3) - competition * 0.2)
+    )
+  )
+
+  const result = {
+    idea,
+    score,
+    demand,
+    sentiment,
+    monetization,
+    trend,
+    competitors,
+    risks: [
+      competition > 50 ? "High competition" : "Low visibility",
+      sentiment < 50 ? "Weak user interest" : "Positive market signal"
+    ],
+    summary: `Demand ${demand}, Sentiment ${sentiment}`
   }
 
-  // MARKET SCORING (rule-based)
-  let market = 50
-  if (signals.ai) market += 20
-  if (signals.saas) market += 15
-  if (signals.marketplace) market -= 5
+  saveIdea(result)
 
-  // MONETIZATION
-  let monetization = 40
-  if (signals.b2b) monetization += 30
-  if (signals.consumer) monetization -= 10
-
-  // COMPETITOR MOCK (replace later with API)
-  const competitors = []
-  if (signals.ai) competitors.push("OpenAI", "Midjourney")
-  if (signals.saas) competitors.push("Notion", "Slack")
-  if (signals.marketplace) competitors.push("Fiverr", "Upwork")
-
-  // TREND (fake but realistic curve)
-  const trend = Array.from({ length: 7 }, () =>
-    Math.floor(40 + Math.random() * 60)
-  )
-
-  // RISKS
-  const risks = []
-  if (signals.marketplace) risks.push("Cold start problem")
-  if (signals.ai) risks.push("High competition")
-  if (!signals.b2b) risks.push("Weak monetization model")
-
-  // FINAL SCORE
-  const score = Math.min(100,
-    Math.round((market + monetization) / 2)
-  )
-
-  return Response.json({
-    score,
-    market,
-    monetization,
-    competitors,
-    trend,
-    risks,
-    summary: `This idea shows ${score > 70 ? "strong" : "moderate"} potential. Focus on differentiation and distribution.`
-  })
+  return Response.json(result)
 }
