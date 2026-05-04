@@ -4,105 +4,88 @@ import { useState } from "react"
 
 export default function Home() {
   const [idea, setIdea] = useState("")
-  const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
-  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
 
-  const analyze = async () => {
+  const analyzeIdea = async () => {
     if (!idea) return
 
     setLoading(true)
-    setResult(null)
-    setError(null)
 
     try {
-      const res = await fetch("/api/analyze", {
+      const res = await fetch("/api/ideas", {
         method: "POST",
-        body: JSON.stringify({
-          idea,
-          userId: "demo-user",
-        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ idea }),
       })
-
-      if (!res.ok) {
-        throw new Error("Request failed")
-      }
 
       const data = await res.json()
       setResult(data)
-    } catch (err) {
-      console.error(err)
-      setError("Something went wrong")
+    } catch (error) {
+      console.error("Error analyzing idea:", error)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <main className="min-h-screen bg-[#020617] text-white flex flex-col px-6 pt-24 pb-20">
-      
-      {/* HEADER */}
-      <h1 className="text-5xl font-serif leading-tight mb-10">
-        AI MARKET <br /> INTELLIGENCE
-      </h1>
+    <main className="min-h-screen bg-[#020617] text-white px-6 py-10">
+      <div className="max-w-2xl mx-auto">
 
-      {/* INPUT */}
-      <input
-        value={idea}
-        onChange={(e) => setIdea(e.target.value)}
-        placeholder="Describe your startup idea..."
-        className="w-full p-4 rounded-xl text-black mb-6"
-      />
+        {/* TITLE */}
+        <h1 className="text-4xl font-serif mb-8 leading-tight">
+          AI MARKET <br /> INTELLIGENCE
+        </h1>
 
-      {/* BUTTON */}
-      <button
-        onClick={analyze}
-        disabled={loading}
-        className="w-full py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 font-semibold"
-      >
-        ⚡ {loading ? "Analyzing..." : "ANALYZE"}
-      </button>
+        {/* INPUT */}
+        <div className="flex gap-2">
+          <input
+            value={idea}
+            onChange={(e) => setIdea(e.target.value)}
+            placeholder="Describe your startup idea..."
+            className="flex-1 p-3 rounded-lg bg-gray-200 text-black"
+          />
 
-      {/* ERROR */}
-      {error && (
-        <p className="mt-4 text-red-400">{error}</p>
-      )}
-
-      {/* RESULTS */}
-      {result && (
-        <div className="mt-10 space-y-4">
-          
-          <div className="p-6 rounded-xl bg-[#0f172a]">
-            <p>CORE SCORE: {result.score}</p>
-          </div>
-
-          <div className="p-6 rounded-xl bg-[#0f172a]">
-            <p>DEMAND: {result.market}</p>
-          </div>
-
-          <div className="p-6 rounded-xl bg-[#0f172a]">
-            <p>SENTIMENT: {result.user}</p>
-          </div>
-
-          <div className="p-6 rounded-xl bg-[#0f172a]">
-            <p>MONETIZATION: {result.monetization}</p>
-          </div>
-
-          <div className="p-6 rounded-xl bg-[#0f172a]">
-            <p>SUMMARY: {result.summary}</p>
-          </div>
-
-          <div className="p-6 rounded-xl bg-[#0f172a]">
-            <p>
-              COMPETITORS:{" "}
-              {Array.isArray(result.competitors)
-                ? result.competitors.join(", ")
-                : "N/A"}
-            </p>
-          </div>
-
+          <button
+            onClick={analyzeIdea}
+            disabled={loading}
+            className="px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-400 to-purple-500 text-black font-semibold"
+          >
+            {loading ? "..." : "⚡ ANALYZE"}
+          </button>
         </div>
-      )}
+
+        {/* RESULTS */}
+        {result && (
+          <div className="mt-10 space-y-6">
+
+            {[
+              ["CORE SCORE", result.score],
+              ["DEMAND", result.market],
+              ["SENTIMENT", result.user],
+              ["MONETIZATION", result.monetization],
+              ["SUMMARY", result.summary],
+              ["COMPETITORS", result.competitors?.join(", ")]
+            ].map(([label, value]) => (
+              <div
+                key={label}
+                className="p-6 rounded-2xl bg-[#0b1220] border border-white/5 shadow-lg"
+              >
+                <p className="text-cyan-400 font-serif text-lg mb-2">
+                  {label}
+                </p>
+                <p className="text-white text-base">
+                  {value || "—"}
+                </p>
+              </div>
+            ))}
+
+          </div>
+        )}
+
+      </div>
     </main>
   )
 }
