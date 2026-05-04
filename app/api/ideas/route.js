@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic"
 export const runtime = "nodejs"
 
-import { getIdeas } from "../../../../lib/store"
+import { getIdeas } from "../../../lib/store"
 
 export async function GET() {
   try {
