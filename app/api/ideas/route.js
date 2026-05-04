@@ -1,5 +1,5 @@
 
-import { getIdeas } from "@/lib/store"
+import { getIdeas } from "../../../lib/store"
 
 // GET → return leaderboard (top ideas)
 export async function GET() {
