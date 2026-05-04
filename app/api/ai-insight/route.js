@@ -9,20 +9,21 @@ export async function POST(req) {
       return Response.json({ error: "Missing idea" }, { status: 400 })
     }
 
-    // FREE TIER
+    // FREE TIER → NO AI
     if (plan !== "pro") {
       return Response.json({
         insight: "Upgrade to Pro for AI insights"
       })
     }
 
-    // NO ENV SAFE
+    // SAFE GUARD (prevents build crash)
     if (!process.env.OPENAI_API_KEY) {
       return Response.json({
-        insight: "AI unavailable (no API key)"
+        insight: "AI unavailable (no key set)"
       })
     }
 
+    // 🔥 CRITICAL: dynamic import ONLY inside function
     const OpenAI = (await import("openai")).default
 
     const client = new OpenAI({
@@ -40,11 +41,11 @@ export async function POST(req) {
     })
 
     return Response.json({
-      insight: completion.choices[0].message.content
+      insight: completion.choices?.[0]?.message?.content || "No insight"
     })
 
   } catch (err) {
-    console.error(err)
+    console.error("AI ERROR:", err)
 
     return Response.json({
       insight: "AI failed safely"
