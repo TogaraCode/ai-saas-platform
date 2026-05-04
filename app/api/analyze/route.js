@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic"
 export const runtime = "nodejs"
 
-import { saveIdea } from "@/lib/store"
+import { saveIdea } from "../../../lib/store"
 
 export async function POST(req) {
   try {
