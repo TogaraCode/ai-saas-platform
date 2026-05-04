@@ -1,30 +1,57 @@
-import fetch from "node-fetch"
+export const dynamic = "force-dynamic"
+export const runtime = "nodejs"
+
 import { saveIdea } from "../../../lib/store"
 
 export async function POST(req) {
-  const { idea, userId } = await req.json()
+  try {
+    const body = await req.json()
+    const { idea, userId } = body || {}
 
-  const trend = [50, 60, 70, 80, 90]
-  const sentiment = 60
-  const competitors = ["Notion", "Slack"]
+    if (!idea || typeof idea !== "string") {
+      return Response.json({ error: "Invalid idea" }, { status: 400 })
+    }
 
-  const demand = 70
-  const monetization = 60
-  const score = 75
+    // ✅ Stable scoring (no randomness spikes)
+    const base = idea.length
 
-  const result = {
-    idea,
-    score,
-    demand,
-    sentiment,
-    monetization,
-    trend,
-    competitors,
-    risks: ["Competition"],
-    summary: "Moderate opportunity"
+    const demand = Math.min(90, 50 + Math.floor(base * 0.5))
+    const sentiment = Math.min(85, 55 + Math.floor(base * 0.4))
+    const monetization = Math.min(80, 50 + Math.floor(base * 0.3))
+
+    const score = Math.round(
+      demand * 0.4 +
+      sentiment * 0.3 +
+      monetization * 0.3
+    )
+
+    const trend = Array.from({ length: 6 }, (_, i) =>
+      Math.min(100, demand - 10 + i * 5)
+    )
+
+    const result = {
+      idea,
+      score,
+      demand,
+      sentiment,
+      monetization,
+      trend,
+      competitors: ["Notion", "Slack", "Airtable"],
+      risks: ["High competition", "Market saturation"],
+      summary: "Solid potential with competitive pressure"
+    }
+
+    // ✅ Safe persistence
+    saveIdea(userId || "guest", result)
+
+    return Response.json(result)
+
+  } catch (err) {
+    console.error("ANALYZE ERROR:", err)
+
+    return Response.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    )
   }
-
-  saveIdea(userId || "guest", result)
-
-  return Response.json(result)
 }
