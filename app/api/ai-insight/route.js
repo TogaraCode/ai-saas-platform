@@ -3,29 +3,26 @@ export const runtime = "nodejs"
 
 export async function POST(req) {
   try {
-    const body = await req.json()
-    const { idea, plan } = body || {}
+    const { idea, plan } = await req.json()
 
-    // ✅ Validate input
-    if (!idea || typeof idea !== "string") {
-      return Response.json({ error: "Invalid idea" }, { status: 400 })
+    if (!idea) {
+      return Response.json({ error: "Missing idea" }, { status: 400 })
     }
 
-    // ✅ FREE TIER → NO AI CALL
+    // FREE TIER
     if (plan !== "pro") {
       return Response.json({
-        insight: "Upgrade to Pro to unlock AI insights"
+        insight: "Upgrade to Pro for AI insights"
       })
     }
 
-    // ✅ NO ENV → SAFE FALLBACK (NO CRASH)
+    // NO ENV SAFE
     if (!process.env.OPENAI_API_KEY) {
       return Response.json({
-        insight: "AI temporarily unavailable"
+        insight: "AI unavailable (no API key)"
       })
     }
 
-    // ✅ IMPORT INSIDE HANDLER (CRITICAL FIX)
     const OpenAI = (await import("openai")).default
 
     const client = new OpenAI({
@@ -37,22 +34,20 @@ export async function POST(req) {
       messages: [
         {
           role: "user",
-          content: `Analyze this SaaS idea and give actionable insight:\n${idea}`
+          content: `Analyze this SaaS idea:\n${idea}`
         }
       ]
     })
 
-    const insight =
-      completion?.choices?.[0]?.message?.content ||
-      "No insight generated"
-
-    return Response.json({ insight })
+    return Response.json({
+      insight: completion.choices[0].message.content
+    })
 
   } catch (err) {
-    console.error("AI ROUTE ERROR:", err)
+    console.error(err)
 
     return Response.json({
-      insight: "AI failed. Try again later."
+      insight: "AI failed safely"
     })
   }
 }
