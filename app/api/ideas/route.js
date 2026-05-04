@@ -1,4 +1,4 @@
-import { getIdeas } from "@/lib/store"
+import { getIdeas } from "../../../lib/store"
 
 export async function POST(req) {
   try {
