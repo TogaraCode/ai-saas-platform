@@ -93,7 +93,7 @@ const kpiGrid = {
 }
 
 const kpi = { background: "#111827", padding: 16, borderRadius: 10 }
-const value = { fontWeight: "bold" }
+const valueStyle = { fontWeight: "bold" }
 const labelStyle = { opacity: 0.6, fontSize: 12 }
 
 const grid = {
