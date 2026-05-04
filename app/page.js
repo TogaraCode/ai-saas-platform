@@ -1,125 +1,108 @@
 "use client"
+
 import { useState } from "react"
 
 export default function Home() {
   const [idea, setIdea] = useState("")
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
+  const [error, setError] = useState(null)
 
-  async function analyze() {
+  const analyze = async () => {
     if (!idea) return
 
     setLoading(true)
     setResult(null)
+    setError(null)
 
     try {
       const res = await fetch("/api/analyze", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idea })
+        body: JSON.stringify({
+          idea,
+          userId: "demo-user",
+        }),
       })
+
+      if (!res.ok) {
+        throw new Error("Request failed")
+      }
 
       const data = await res.json()
       setResult(data)
-
     } catch (err) {
       console.error(err)
+      setError("Something went wrong")
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   return (
-    <div style={root}>
-      <div style={container}>
+    <main className="min-h-screen bg-[#020617] text-white flex flex-col px-6 pt-24 pb-20">
+      
+      {/* HEADER */}
+      <h1 className="text-5xl font-serif leading-tight mb-10">
+        AI MARKET <br /> INTELLIGENCE
+      </h1>
 
-        <h1 style={title}>AI MARKET INTELLIGENCE</h1>
+      {/* INPUT */}
+      <input
+        value={idea}
+        onChange={(e) => setIdea(e.target.value)}
+        placeholder="Describe your startup idea..."
+        className="w-full p-4 rounded-xl text-black mb-6"
+      />
 
-        <input
-          placeholder="Describe your startup idea..."
-          value={idea}
-          onChange={(e) => setIdea(e.target.value)}
-          style={input}
-        />
+      {/* BUTTON */}
+      <button
+        onClick={analyze}
+        disabled={loading}
+        className="w-full py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 font-semibold"
+      >
+        ⚡ {loading ? "Analyzing..." : "ANALYZE"}
+      </button>
 
-        <button onClick={analyze} style={button}>
-          {loading ? "Analyzing..." : "⚡ ANALYZE"}
-        </button>
+      {/* ERROR */}
+      {error && (
+        <p className="mt-4 text-red-400">{error}</p>
+      )}
 
-        {/* 🔥 RESULT SECTION */}
-        {result && (
-          <div style={results}>
-            <Card title="CORE SCORE">{result.score}</Card>
-            <Card title="DEMAND">{result.demand}</Card>
-            <Card title="SENTIMENT">{result.sentiment}</Card>
-            <Card title="MONETIZATION">{result.monetization}</Card>
-
-            <Card title="SUMMARY">{result.summary}</Card>
-
-            <Card title="COMPETITORS">
-              {result.competitors?.join(", ")}
-            </Card>
-
-            <Card title="RISKS">
-              {result.risks?.join(", ")}
-            </Card>
+      {/* RESULTS */}
+      {result && (
+        <div className="mt-10 space-y-4">
+          
+          <div className="p-6 rounded-xl bg-[#0f172a]">
+            <p>CORE SCORE: {result.score}</p>
           </div>
-        )}
 
-      </div>
-    </div>
+          <div className="p-6 rounded-xl bg-[#0f172a]">
+            <p>DEMAND: {result.market}</p>
+          </div>
+
+          <div className="p-6 rounded-xl bg-[#0f172a]">
+            <p>SENTIMENT: {result.user}</p>
+          </div>
+
+          <div className="p-6 rounded-xl bg-[#0f172a]">
+            <p>MONETIZATION: {result.monetization}</p>
+          </div>
+
+          <div className="p-6 rounded-xl bg-[#0f172a]">
+            <p>SUMMARY: {result.summary}</p>
+          </div>
+
+          <div className="p-6 rounded-xl bg-[#0f172a]">
+            <p>
+              COMPETITORS:{" "}
+              {Array.isArray(result.competitors)
+                ? result.competitors.join(", ")
+                : "N/A"}
+            </p>
+          </div>
+
+        </div>
+      )}
+    </main>
   )
-}
-
-function Card({ title, children }) {
-  return (
-    <div style={card}>
-      <div style={cardTitle}>{title}</div>
-      <div>{children}</div>
-    </div>
-  )
-}
-
-/* STYLES */
-const root = {
-  minHeight: "100vh",
-  background: "#020617",
-  color: "white",
-  padding: 20
-}
-
-const container = { maxWidth: 900, margin: "0 auto" }
-
-const title = { marginBottom: 20 }
-
-const input = {
-  width: "100%",
-  padding: 14,
-  marginBottom: 12,
-  borderRadius: 12
-}
-
-const button = {
-  width: "100%",
-  padding: 14,
-  borderRadius: 14,
-  background: "linear-gradient(90deg,#22d3ee,#a855f7)",
-  border: "none",
-  marginBottom: 20
-}
-
-const results = {
-  display: "grid",
-  gap: 12
-}
-
-const card = {
-  padding: 16,
-  borderRadius: 12,
-  background: "#0f172a"
-}
-
-const cardTitle = {
-  color: "#22d3ee",
-  marginBottom: 6
 }
