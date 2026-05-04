@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic"
 export const runtime = "nodejs"
 
-import { saveIdea } from "../../../../lib/store"
+import { saveIdea } from "../../../lib/store"
 
 const HIGH_DEMAND = ["ai", "automation", "platform", "tool", "marketplace"]
 const MONETIZATION_STRONG = ["saas", "subscription", "b2b", "enterprise"]
