@@ -3,56 +3,40 @@ import { useState } from "react"
 
 export default function Home() {
   const [idea, setIdea] = useState("")
-  const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
+  const [loading, setLoading] = useState(false)
 
-  async function analyzeIdea() {
+  async function analyze() {
     if (!idea) return
 
     setLoading(true)
-    setResult(null)
 
-    try {
-      const res = await fetch("/api/analyze", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ idea })
-      })
+    const res = await fetch("/api/analyze", {
+      method: "POST",
+      body: JSON.stringify({ idea })
+    })
 
-      const data = await res.json()
-      setResult(data)
-    } catch (err) {
-      console.error(err)
-    }
+    const data = await res.json()
 
+    setResult(data)
     setLoading(false)
   }
 
   return (
     <div style={root}>
-
-      {/* BACKGROUND */}
-      <div style={bg} />
-      <div style={grid} />
-
-      <div style={content}>
+      <div style={container}>
 
         {/* HEADER */}
         <div style={header}>
-          <div style={logo}>
-            <span style={logoMain}>NEXUS</span>
-            <span style={logoSub}>CORE</span>
-          </div>
-
+          <div style={logo}>NEXUS CORE</div>
           <input
             placeholder="Search ideas..."
             style={search}
           />
-
-          <div style={icon}>⚡</div>
-          <div style={icon}>👤</div>
+          <div style={icons}>
+            <div style={icon}>⚡</div>
+            <div style={icon}>👤</div>
+          </div>
         </div>
 
         {/* HERO */}
@@ -66,50 +50,67 @@ export default function Home() {
             style={input}
           />
 
-          <button onClick={analyzeIdea} style={cta}>
+          <button style={cta} onClick={analyze}>
             ⚡ ANALYZE
           </button>
 
-          {loading && <div style={scan} />}
+          {loading && <div style={loadingBar}></div>}
         </div>
 
         {/* RESULTS */}
         {result && (
-          <div style={dashboard}>
+          <div style={grid}>
 
+            {/* SCORE */}
             <Panel title="CORE SCORE">
-              <Holo value={result.score || 0} />
+              <ScoreRing value={result.score} />
             </Panel>
 
-            <Panel title="MARKET">
-              <div style={text}>
-                {result.market_size}
-              </div>
+            {/* TREND */}
+            <Panel title="MARKET TREND">
+              <LineChart data={result.trend || []} />
             </Panel>
 
-            <Panel title="USER">
-              <div style={text}>
-                {result.target_user}
-              </div>
-            </Panel>
-
-            <Panel title="MONETIZATION">
-              <div style={text}>
-                {result.monetization}
-              </div>
-            </Panel>
-
-            <Panel title="RISKS">
-              <ul>
-                {result.risks?.map((r, i) => (
-                  <li key={i}>{r}</li>
+            {/* COMPETITORS */}
+            <Panel title="COMPETITION">
+              <div style={tags}>
+                {result.competitors?.map((c) => (
+                  <div key={c} style={tag}>{c}</div>
                 ))}
-              </ul>
+              </div>
             </Panel>
 
-            <Panel title="SUMMARY">
-              <div style={text}>
-                {result.summary}
+            {/* MONETIZATION */}
+            <Panel title="MONETIZATION">
+              <div style={bigNumber}>{result.monetization}</div>
+            </Panel>
+
+            {/* RISKS */}
+            <Panel title="RISKS">
+              {result.risks?.map((r, i) => (
+                <div key={i} style={risk}>⚠ {r}</div>
+              ))}
+            </Panel>
+
+            {/* SUMMARY */}
+            <Panel title="AI INSIGHT">
+              <div style={summary}>{result.summary}</div>
+            </Panel>
+
+            {/* SIGNAL */}
+            <Panel title="INVESTMENT SIGNAL">
+              <div style={{
+                ...signal,
+                color:
+                  result.score > 75 ? "#22c55e" :
+                  result.score > 50 ? "#facc15" :
+                  "#f87171"
+              }}>
+                {result.score > 75
+                  ? "STRONG OPPORTUNITY"
+                  : result.score > 50
+                  ? "MODERATE"
+                  : "HIGH RISK"}
               </div>
             </Panel>
 
@@ -117,25 +118,6 @@ export default function Home() {
         )}
 
       </div>
-
-      <style>{`
-        @keyframes glow {
-          0% { box-shadow: 0 0 10px #22d3ee }
-          50% { box-shadow: 0 0 30px #a855f7 }
-          100% { box-shadow: 0 0 10px #22d3ee }
-        }
-
-        @keyframes scan {
-          0% { transform: translateX(-100%) }
-          100% { transform: translateX(100%) }
-        }
-
-        @keyframes spin {
-          from { transform: rotate(0deg) }
-          to { transform: rotate(360deg) }
-        }
-      `}</style>
-
     </div>
   )
 }
@@ -151,12 +133,67 @@ function Panel({ title, children }) {
   )
 }
 
-function Holo({ value }) {
+/* SCORE RING */
+function ScoreRing({ value }) {
+  const radius = 60
+  const circumference = 2 * Math.PI * radius
+  const offset = circumference - (value / 100) * circumference
+
   return (
-    <div style={holo}>
-      <div style={ring} />
-      <div style={center}>{value}</div>
-    </div>
+    <svg width="140" height="140">
+      <circle cx="70" cy="70" r={radius}
+        stroke="rgba(255,255,255,0.1)"
+        strokeWidth="6"
+        fill="none"
+      />
+      <circle cx="70" cy="70" r={radius}
+        stroke="url(#grad)"
+        strokeWidth="6"
+        fill="none"
+        strokeDasharray={circumference}
+        strokeDashoffset={offset}
+        style={{
+          transform: "rotate(-90deg)",
+          transformOrigin: "50% 50%"
+        }}
+      />
+      <defs>
+        <linearGradient id="grad">
+          <stop offset="0%" stopColor="#22d3ee"/>
+          <stop offset="100%" stopColor="#a855f7"/>
+        </linearGradient>
+      </defs>
+      <text x="50%" y="50%" textAnchor="middle" dy=".3em"
+        style={{ fontSize: 28, fill: "white" }}>
+        {value}
+      </text>
+    </svg>
+  )
+}
+
+/* LINE CHART */
+function LineChart({ data }) {
+  if (!data.length) return null
+
+  const width = 300
+  const height = 120
+  const max = Math.max(...data)
+
+  const points = data.map((d, i) => {
+    const x = (i / (data.length - 1)) * width
+    const y = height - (d / max) * height
+    return `${x},${y}`
+  }).join(" ")
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%" }}>
+      <polyline
+        fill="none"
+        stroke="#22d3ee"
+        strokeWidth="3"
+        points={points}
+      />
+    </svg>
   )
 }
 
@@ -164,53 +201,41 @@ function Holo({ value }) {
 
 const root = {
   minHeight: "100vh",
+  background: "#020617",
   color: "white",
   fontFamily: "system-ui"
 }
 
-const bg = {
-  position: "fixed",
-  inset: 0,
-  background: `
-    radial-gradient(circle at 20% 20%, rgba(168,85,247,0.3), transparent),
-    radial-gradient(circle at 80% 40%, rgba(34,211,238,0.3), transparent),
-    #020617`
-}
-
-const grid = {
-  position: "fixed",
-  inset: 0,
-  backgroundImage: `
-    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)
-  `,
-  backgroundSize: "40px 40px",
-  opacity: 0.2
-}
-
-const content = {
-  position: "relative",
+const container = {
+  maxWidth: 1100,
+  margin: "0 auto",
   padding: 16
 }
 
 const header = {
   display: "flex",
-  gap: 10,
+  alignItems: "center",
   marginBottom: 20,
-  alignItems: "center"
+  gap: 10
 }
 
-const logo = { display: "flex", gap: 6 }
-const logoMain = { color: "#22d3ee", fontWeight: 900 }
-const logoSub = { color: "#a855f7" }
+const logo = {
+  fontWeight: "bold",
+  color: "#22d3ee"
+}
 
 const search = {
   flex: 1,
   padding: 10,
   borderRadius: 12,
-  background: "rgba(0,0,0,0.4)",
-  border: "1px solid rgba(255,255,255,0.2)",
+  background: "#111827",
+  border: "1px solid #1f2937",
   color: "white"
+}
+
+const icons = {
+  display: "flex",
+  gap: 8
 }
 
 const icon = {
@@ -226,12 +251,12 @@ const icon = {
 const hero = {
   padding: 20,
   borderRadius: 20,
-  background: "rgba(0,0,0,0.6)",
+  background: "#111827",
   marginBottom: 20
 }
 
 const title = {
-  fontSize: 26,
+  fontSize: 24,
   marginBottom: 10
 }
 
@@ -240,8 +265,8 @@ const input = {
   padding: 12,
   borderRadius: 12,
   marginBottom: 10,
-  background: "rgba(0,0,0,0.4)",
-  border: "1px solid rgba(255,255,255,0.2)",
+  background: "#020617",
+  border: "1px solid #1f2937",
   color: "white"
 }
 
@@ -249,30 +274,29 @@ const cta = {
   width: "100%",
   padding: 14,
   borderRadius: 14,
-  border: "none",
   background: "linear-gradient(90deg,#22d3ee,#a855f7,#ec4899)",
+  border: "none",
   color: "white",
-  fontWeight: "bold",
-  animation: "glow 2s infinite"
+  fontWeight: "bold"
 }
 
-const scan = {
+const loadingBar = {
   height: 4,
   marginTop: 10,
-  background: "linear-gradient(90deg,#22d3ee,#a855f7)",
-  animation: "scan 1s infinite"
+  background: "#22d3ee",
+  animation: "pulse 1s infinite"
 }
 
-const dashboard = {
+const grid = {
   display: "grid",
-  gap: 14,
+  gap: 16,
   gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))"
 }
 
 const panel = {
   padding: 16,
   borderRadius: 16,
-  background: "rgba(0,0,0,0.6)"
+  background: "#111827"
 }
 
 const panelTitle = {
@@ -280,32 +304,34 @@ const panelTitle = {
   color: "#22d3ee"
 }
 
-const text = {
-  opacity: 0.8
-}
-
-/* HOLO */
-
-const holo = {
-  width: 120,
-  height: 120,
-  margin: "auto",
-  position: "relative"
-}
-
-const ring = {
-  position: "absolute",
-  inset: 0,
-  borderRadius: "50%",
-  border: "2px solid #22d3ee",
-  animation: "spin 6s linear infinite"
-}
-
-const center = {
-  position: "absolute",
-  inset: 0,
+const tags = {
   display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  fontSize: 24
+  gap: 6,
+  flexWrap: "wrap"
+}
+
+const tag = {
+  padding: "6px 10px",
+  borderRadius: 10,
+  background: "#020617"
+}
+
+const risk = {
+  color: "#f87171",
+  fontSize: 12
+}
+
+const summary = {
+  opacity: 0.8,
+  lineHeight: 1.5
+}
+
+const bigNumber = {
+  fontSize: 28,
+  fontWeight: "bold"
+}
+
+const signal = {
+  fontSize: 20,
+  fontWeight: "bold"
 }
