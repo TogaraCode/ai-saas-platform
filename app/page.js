@@ -1,10 +1,17 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 export default function Home() {
   const [idea, setIdea] = useState("")
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [mouse, setMouse] = useState({ x: 0, y: 0 })
+
+  useEffect(() => {
+    const move = (e) => setMouse({ x: e.clientX, y: e.clientY })
+    window.addEventListener("mousemove", move)
+    return () => window.removeEventListener("mousemove", move)
+  }, [])
 
   async function analyze() {
     if (!idea) return
@@ -24,15 +31,25 @@ export default function Home() {
   return (
     <div style={root}>
 
-      {/* 🌌 ANIMATED BACKGROUND */}
-      <div style={bg}></div>
+      {/* 🎯 CURSOR LIGHT */}
+      <div style={{
+        ...cursorGlow,
+        left: mouse.x - 150,
+        top: mouse.y - 150
+      }}/>
+
+      {/* 🌌 PARALLAX BACKGROUND */}
+      <div style={bgLayer1}></div>
+      <div style={bgLayer2}></div>
 
       <div style={container}>
 
         {/* HEADER */}
         <div style={header}>
           <div style={logo}>NEXUS</div>
+
           <input placeholder="Search..." style={search}/>
+
           <div style={icons}>
             <div style={icon}>⚡</div>
             <div style={icon}>👤</div>
@@ -50,7 +67,12 @@ export default function Home() {
             style={input}
           />
 
-          <button style={cta} onClick={analyze}>
+          <button
+            style={cta}
+            onMouseMove={(e)=>magnet(e)}
+            onMouseLeave={(e)=>resetMagnet(e)}
+            onClick={analyze}
+          >
             ⚡ ANALYZE
           </button>
 
@@ -60,7 +82,6 @@ export default function Home() {
         {/* RESULTS */}
         {result && (
           <div style={grid}>
-
             <Card title="CORE SCORE">
               <ScoreRing value={result.score}/>
             </Card>
@@ -81,43 +102,29 @@ export default function Home() {
               <Tags items={result.competitors}/>
             </Card>
 
-            <Card title="RISKS">
-              {result.risks.map((r,i)=>(
-                <div key={i} style={risk}>⚠ {r}</div>
-              ))}
-            </Card>
-
             <Card title="INSIGHT">
               <div style={summary}>{result.summary}</div>
             </Card>
-
           </div>
         )}
 
       </div>
 
-      {/* ANIMATIONS */}
       <style>{`
         @keyframes float {
-          0% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-          100% { transform: translateY(0px); }
+          0% { transform: translateY(0px) }
+          50% { transform: translateY(-10px) }
+          100% { transform: translateY(0px) }
         }
 
-        @keyframes glow {
-          0% { opacity: 0.4; }
-          50% { opacity: 0.8; }
-          100% { opacity: 0.4; }
-        }
-
-        @keyframes draw {
-          from { stroke-dashoffset: 300; }
-          to { stroke-dashoffset: 0; }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(20px) }
+          to { opacity: 1; transform: translateY(0) }
         }
 
         @keyframes scan {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
+          0% { transform: translateX(-100%) }
+          100% { transform: translateX(100%) }
         }
       `}</style>
 
@@ -125,7 +132,21 @@ export default function Home() {
   )
 }
 
-/* ================= COMPONENTS ================= */
+/* ===== INTERACTIONS ===== */
+
+function magnet(e) {
+  const rect = e.target.getBoundingClientRect()
+  const x = e.clientX - rect.left - rect.width / 2
+  const y = e.clientY - rect.top - rect.height / 2
+
+  e.target.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`
+}
+
+function resetMagnet(e) {
+  e.target.style.transform = "translate(0,0)"
+}
+
+/* ===== COMPONENTS ===== */
 
 function Card({ title, children }) {
   return (
@@ -143,11 +164,12 @@ function ScoreRing({ value }) {
 
   return (
     <svg width="140" height="140">
-      <circle cx="70" cy="70" r={r} stroke="#222" strokeWidth="6" fill="none"/>
+      <circle cx="70" cy="70" r={r} stroke="#111" strokeWidth="6" fill="none"/>
       <circle
-        cx="70" cy="70"
+        cx="70"
+        cy="70"
         r={r}
-        stroke="#22d3ee"
+        stroke="url(#grad)"
         strokeWidth="6"
         fill="none"
         strokeDasharray={c}
@@ -155,9 +177,15 @@ function ScoreRing({ value }) {
         style={{
           transform: "rotate(-90deg)",
           transformOrigin: "50% 50%",
-          transition: "stroke-dashoffset 1s ease"
+          transition: "1s"
         }}
       />
+      <defs>
+        <linearGradient id="grad">
+          <stop offset="0%" stopColor="#22d3ee"/>
+          <stop offset="100%" stopColor="#a855f7"/>
+        </linearGradient>
+      </defs>
       <text x="50%" y="50%" textAnchor="middle" dy=".3em"
         style={{ fontSize: 24, fill: "white" }}>
         {value}
@@ -168,8 +196,8 @@ function ScoreRing({ value }) {
 
 function LineChart({ data }) {
   if (!data) return null
-
   const max = Math.max(...data)
+
   const points = data.map((v,i)=>`${i*40},${120-(v/max)*120}`).join(" ")
 
   return (
@@ -180,9 +208,7 @@ function LineChart({ data }) {
         stroke="#22d3ee"
         strokeWidth="3"
         style={{
-          strokeDasharray: 300,
-          strokeDashoffset: 0,
-          animation: "draw 1.2s ease"
+          filter: "drop-shadow(0 0 10px #22d3ee)"
         }}
       />
     </svg>
@@ -190,11 +216,7 @@ function LineChart({ data }) {
 }
 
 function BigStat({ value }) {
-  return (
-    <div style={big}>
-      {value}
-    </div>
-  )
+  return <div style={big}>{value}</div>
 }
 
 function Tags({ items }) {
@@ -205,123 +227,147 @@ function Tags({ items }) {
   )
 }
 
-/* ================= STYLES ================= */
+/* ===== STYLES ===== */
 
 const root = {
   minHeight: "100vh",
   background: "#020617",
   color: "white",
-  fontFamily: "system-ui"
+  fontFamily: "system-ui",
+  overflow: "hidden"
 }
 
-const bg = {
+const cursorGlow = {
+  position: "fixed",
+  width: 300,
+  height: 300,
+  borderRadius: "50%",
+  background: "radial-gradient(circle, rgba(34,211,238,0.15), transparent)",
+  pointerEvents: "none",
+  zIndex: 0
+}
+
+const bgLayer1 = {
   position: "fixed",
   inset: 0,
-  background: `
-    radial-gradient(circle at 20% 20%, rgba(168,85,247,0.3), transparent),
-    radial-gradient(circle at 80% 40%, rgba(34,211,238,0.3), transparent)
-  `,
-  animation: "glow 6s infinite"
+  background: "radial-gradient(circle at 20% 30%, #a855f722, transparent)",
+  animation: "float 10s infinite"
 }
 
-const container = { padding: 16, position:"relative" }
+const bgLayer2 = {
+  position: "fixed",
+  inset: 0,
+  background: "radial-gradient(circle at 80% 70%, #22d3ee22, transparent)",
+  animation: "float 14s infinite reverse"
+}
 
-const header = { display:"flex", gap:10, marginBottom:20 }
+const container = {
+  position: "relative",
+  zIndex: 1,
+  padding: 16
+}
 
-const logo = { color:"#22d3ee", fontWeight:"bold" }
+const header = {
+  display: "flex",
+  gap: 10,
+  marginBottom: 20
+}
+
+const logo = {
+  fontWeight: "bold",
+  color: "#22d3ee"
+}
 
 const search = {
-  flex:1,
-  padding:10,
-  borderRadius:10,
-  background:"#111827",
-  border:"1px solid #1f2937",
-  color:"white"
+  flex: 1,
+  padding: 10,
+  borderRadius: 10,
+  background: "#111827",
+  border: "1px solid #1f2937",
+  color: "white"
 }
 
-const icons = { display:"flex", gap:6 }
+const icons = { display: "flex", gap: 6 }
 
 const icon = {
-  width:40,
-  height:40,
-  borderRadius:"50%",
-  background:"linear-gradient(#22d3ee,#a855f7)",
-  display:"flex",
-  alignItems:"center",
-  justifyContent:"center"
+  width: 40,
+  height: 40,
+  borderRadius: "50%",
+  background: "linear-gradient(#22d3ee,#a855f7)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center"
 }
 
 const hero = {
-  padding:20,
-  borderRadius:20,
-  background:"rgba(17,24,39,0.6)",
-  backdropFilter:"blur(10px)",
-  marginBottom:20
+  padding: 20,
+  borderRadius: 20,
+  background: "rgba(17,24,39,0.6)",
+  backdropFilter: "blur(12px)",
+  marginBottom: 20,
+  animation: "fadeIn 0.8s ease"
 }
 
-const title = { fontSize:24 }
+const title = { fontSize: 24 }
 
 const input = {
-  width:"100%",
-  padding:12,
-  borderRadius:10,
-  marginTop:10,
-  background:"#020617",
-  border:"1px solid #1f2937",
-  color:"white"
+  width: "100%",
+  padding: 12,
+  marginTop: 10,
+  borderRadius: 10,
+  background: "#020617",
+  border: "1px solid #1f2937",
+  color: "white"
 }
 
 const cta = {
-  marginTop:10,
-  width:"100%",
-  padding:14,
-  borderRadius:14,
-  background:"linear-gradient(90deg,#22d3ee,#a855f7,#ec4899)",
-  border:"none",
-  cursor:"pointer",
-  transition:"0.2s"
+  marginTop: 10,
+  width: "100%",
+  padding: 14,
+  borderRadius: 14,
+  background: "linear-gradient(90deg,#22d3ee,#a855f7,#ec4899)",
+  border: "none",
+  cursor: "pointer",
+  transition: "0.2s"
 }
 
 const scan = {
-  height:4,
-  marginTop:10,
-  background:"#22d3ee",
-  animation:"scan 1s infinite"
+  height: 4,
+  marginTop: 10,
+  background: "#22d3ee",
+  animation: "scan 1s infinite"
 }
 
 const grid = {
-  display:"grid",
-  gap:14,
-  gridTemplateColumns:"repeat(auto-fit,minmax(250px,1fr))"
+  display: "grid",
+  gap: 14,
+  gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))"
 }
 
 const card = {
-  padding:16,
-  borderRadius:16,
-  background:"rgba(17,24,39,0.6)",
-  backdropFilter:"blur(10px)",
-  border:"1px solid rgba(255,255,255,0.1)",
-  transition:"0.3s",
-  cursor:"pointer"
+  padding: 16,
+  borderRadius: 16,
+  background: "rgba(17,24,39,0.6)",
+  backdropFilter: "blur(12px)",
+  border: "1px solid rgba(255,255,255,0.1)",
+  transition: "0.3s",
+  animation: "fadeIn 0.6s ease"
 }
 
-card[":hover"] = {
-  transform:"translateY(-4px)"
+const cardTitle = {
+  marginBottom: 10,
+  color: "#22d3ee"
 }
 
-const cardTitle = { marginBottom:10, color:"#22d3ee" }
-
-const tags = { display:"flex", gap:6, flexWrap:"wrap" }
+const tags = { display: "flex", gap: 6, flexWrap: "wrap" }
 
 const tag = {
-  padding:"6px 10px",
-  borderRadius:10,
-  background:"#020617",
-  border:"1px solid #1f2937"
+  padding: "6px 10px",
+  borderRadius: 10,
+  background: "#020617",
+  border: "1px solid #1f2937"
 }
 
-const risk = { color:"#f87171", fontSize:12 }
+const summary = { opacity: 0.8 }
 
-const summary = { opacity:0.8 }
-
-const big = { fontSize:28, fontWeight:"bold" }
+const big = { fontSize: 28, fontWeight: "bold" }
