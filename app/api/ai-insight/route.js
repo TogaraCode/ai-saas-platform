@@ -1,4 +1,3 @@
-
 import OpenAI from "openai"
 
 const client = new OpenAI({
@@ -9,20 +8,16 @@ export async function POST(req) {
   const { idea, data } = await req.json()
 
   const prompt = `
-You are a SaaS expert.
-
 Idea: ${idea}
 
-Data:
-- Score: ${data.score}
-- Demand: ${data.demand}
-- Sentiment: ${data.sentiment}
-- Competitors: ${data.competitors.join(", ")}
+Score: ${data.score}
+Demand: ${data.demand}
+Sentiment: ${data.sentiment}
 
 Give:
-1. Key insight
-2. Main risk
-3. Strategic recommendation
+- Insight
+- Risk
+- Strategy
 `
 
   const res = await client.chat.completions.create({
